@@ -21,15 +21,21 @@ class GaeJsonEncoder(json.JSONEncoder):
 
 		if isinstance(obj, db.Model):
 			properties = obj.properties().iteritems()
-			output = {'__key': str(obj.key())}
+			output = {
+				'key': str(obj.key()),
+				'__type': 'db.Model',
+				'__model_type': obj.kind()
+			}
 			for field, value in properties:
 				output[field] = self.default(getattr(obj, field))
 			return output
 
 		if isinstance(obj, datetime.datetime):
-			output = {}
+			output = {
+				'__type': 'datetime.datetime'
+			}
 			fields = ['day', 'hour', 'microsecond', 'minute', 'month', 'second', 'year']
-			methods = ['ctime', 'isocalendar', 'isoformat', 'isoweekday', 'timetuple']
+			methods = ['ctime', 'isocalendar', 'isoformat', 'isoweekday']
 			for field in fields:
 				output[field] = getattr(obj, field)
 			for method in methods:
@@ -41,7 +47,9 @@ class GaeJsonEncoder(json.JSONEncoder):
 			return list(obj)
 
 		if isinstance(obj, users.User):
-			output = {}
+			output = {
+				'__type': 'db.User'
+			}
 			methods = ['nickname', 'email', 'auth_domain']
 			for method in methods:
 				output[method] = getattr(obj, method)()

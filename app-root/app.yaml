@@ -4,5 +4,11 @@ runtime: python
 api_version: 1
 
 handlers:
-- url: /.*
+- url: /
   script: main.py
+
+- url: /(node|tree).*
+  script: main.py
+
+- url: /
+  static_dir: www_root/
