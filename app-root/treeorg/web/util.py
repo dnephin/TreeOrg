@@ -12,7 +12,7 @@ try:
 except:
 	import json
 
-import data
+from treeorg.web import models
 
 
 class GaeJsonEncoder(json.JSONEncoder):
@@ -79,7 +79,7 @@ class GaeJsonEncoder(json.JSONEncoder):
 		return obj
 
 
-__model_module=data
+__model_module=models
 
 def decode_object_hook(obj):
 
@@ -87,7 +87,7 @@ def decode_object_hook(obj):
 
 	if obj_type == 'db.Model':
 		model_type = obj['__model_type']
-		cls = getattr(data, model_type)
+		cls = getattr(models, model_type)
 		del obj['__type']
 		del obj['__model_type']
 		web.debug(obj)
