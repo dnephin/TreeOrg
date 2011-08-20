@@ -46,13 +46,13 @@ class NodeSave(NodeServlet):
 	# TODO: logged in decorator
 	def POST(self):
 		user = users.get_current_user()
-		params = web.input()
 		# TODO: handle errors?
-		# TODO: strip user
-		debug(params)
-		node = data.Node.for_user(user=user, **params)
-		node.put()
-		return util.json_encoder.encode(node)
+		new_node = util.json_dec(web.data())
+		# Check old node belongs to this user
+		old_node = data.Node.get(new_node.key())
+		assert old_node.user == user
+		new_node.put()
+		return util.json_enc(new_node)
 
 class NodeGet(NodeServlet):
 
@@ -78,7 +78,7 @@ class NodeGet(NodeServlet):
 			if not node or node.user != user:
 				raise web.notfound()
 
-		return util.json_encoder.encode(node)
+		return util.json_enc(node)
 
 NodeUpdate = NodeDelete = NodeGet
 

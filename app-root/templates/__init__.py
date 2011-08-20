@@ -91,6 +91,24 @@ nodes = CompiledTemplate(nodes, 'templates/nodes.html')
 join_ = nodes._join; escape_ = nodes._escape
 
 # coding: utf-8
+def index (context):
+    __lineoffset__ = -4
+    loop = ForLoop()
+    self = TemplateResult(); extend_ = self.extend
+    extend_([u'\n'])
+    self['title'] = join_(u'Explore the Tree')
+    extend_([u'\n'])
+    extend_([u'<div>You are ', escape_(context.user, True), u'</div>\n'])
+    extend_([u'What is this about?\n'])
+    extend_([u'\n'])
+    extend_([u'\n'])
+
+    return self
+
+index = CompiledTemplate(index, 'templates/index.html')
+join_ = index._join; escape_ = index._escape
+
+# coding: utf-8
 def tree (context):
     __lineoffset__ = -4
     loop = ForLoop()
