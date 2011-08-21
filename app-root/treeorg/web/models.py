@@ -8,6 +8,10 @@ class Node(db.Expando):
 	value = db.StringProperty()
 	children = db.ListProperty(db.Key)
 	parent_node = db.SelfReferenceProperty()
+	# time created
+	# time updated
+	
+	#display = db.ReferenceProperty()
 
 #	@classmethod
 #	def key(cls, name=None):

@@ -2,17 +2,26 @@
 
 
 class Display
-	constructor: () ->
+	constructor: (@data, @parent) ->
+
+	render: () ->
+		ele = $("<div> #{@data.value} </div>")
+		ele.addClass('node default_display')
+		@parent.append(ele)
 
 
 class Node
-	constructor: (@data) ->
+	constructor: (@parent) ->
 
 	
 	load: (key) ->
+		target = if key then "?node=#key" else ""
 		$.get(
-			"/node/get?node=#key",
-			(data) => @data = data,
+			"/node/get#target",
+			(data) => 
+				@data = data
+				@display()
+			,
 			'json'
 		)
 
@@ -24,5 +33,13 @@ class Node
 			'json'
 		)
 
+	display: () ->
+		display = new Display @data, @parent
+		display.render()
 
-window.node = new Node {1:2}
+
+$(document).ready( ->
+	# Load the root node
+	root_node = new Node $('body')
+	root_node.load()
+)
