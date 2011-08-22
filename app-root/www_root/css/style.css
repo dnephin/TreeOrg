@@ -65,10 +65,18 @@ td { vertical-align: top; }
 /* ==|== primary styles =====================================================
    Author: 
    ========================================================================== */
-.node {
+.default_display {
 	padding; 3px;
 	margin: 2px;
 	border: solid 1px #e9e9e9;
+	width: 300px;
+}
+
+.default_display INPUT.value {
+	padding: 3px;
+	margin: 2px;
+	font-size: 1.2em;
+	border: 0px;
 }
 
 /* ==|== non-semantic helper classes ======================================== */
