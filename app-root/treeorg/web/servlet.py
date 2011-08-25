@@ -55,14 +55,14 @@ class Tree(Servlet):
 
 class NodeServlet(Servlet):
 	url_base = 'node'
-
-class NodeSave(NodeServlet):
-	action = 'save'
+	extra = [
+		'([^/]*)'
+	]
 
 	# TODO: filter reserved kwargs (key_name, id, parent, etc)
 
 	# TODO: logged in decorator
-	def POST(self):
+	def POST(self, key):
 		user = users.get_current_user()
 		# TODO: handle errors?
 		new_node = util.json_dec(web.data())
@@ -72,15 +72,11 @@ class NodeSave(NodeServlet):
 		new_node.put()
 		return util.json_enc(new_node)
 
-class NodeGet(NodeServlet):
-	action = 'get'
-
 	# TODO: logged in decorator
-	def GET(self):
+	def GET(self, key):
 		user = users.get_current_user()
-		params = web.input(node=None)
 
-		if not params.node:
+		if not key:
 			query = models.Node.all()
 			query.filter('user =', user)
 			query.filter('root_node =', True)
@@ -93,16 +89,10 @@ class NodeGet(NodeServlet):
 			else:
 				node = node[0]
 		else:
-			node = models.Node.get(params.node)
+			node = models.Node.get(key)
 			if not node or node.user != user:
 				raise web.notfound()
 
 		return util.json_enc(node)
 
-class NodeDelete(NodeServlet):
-	action = 'delete'
-
-	def POST(self):
-		pass
-
-
+	PUT = POST

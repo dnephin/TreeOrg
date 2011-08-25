@@ -1,73 +1,86 @@
 
 
+class NodeView extends Backbone.View
 
-class Display
-	constructor: (@node, @parent) ->
+	tagName: 'div'
 
-	render: ->
-		div = $('<div>').addClass('node default_display')
-		div.append( @build_value() )
-		div.after( @build_children() )
-		return div
+	className: 'node default_display'
+
+	initialize: (options) =>
+		@model.bind('change', @render)
+		@model.view = this
+
+	events: 
+		'change .value': "update",
+
+	render: =>
+		$(@el).html( @build_value() )
+		@build_children()
+		return this
 
 	build_value: ->
-		ele = $("""<input type="text" value="#{@node.data.value}">""")
+		$("""<input type="text" value="#{@model.get('value')}">""")
 			.addClass('value')
-		ele.change( (event) => 
-				@node.data.value = ele.val()
-				@node.save()
-			)
-		return ele
 
 	build_children: ->
-		children = for child in @node.data.children
-				$("<div>")
+		for child in @model.get('children')
+				$(@el).after $("<div>")
+
+		$(@el).after $('<div>')
+
+	update: ->
+		@model.set 'value': $(@el).children('.value').val()
+		@model.save()
 
 
-class Node
-	constructor: (@data, @child_depth=5) ->
+class ChildNodeView extends Backbone.View
+
+	tagName: 'div'
+
+	className: 'node default_child_node'
+
+	initialize: (options) =>
+		@parent = options.parent
+		@model.view = this
+	
+	render: =>
+		$(el).html(@model.value)
+
+class Node extends Backbone.Model
+
+	urlRoot: '/node/'
+
+	fetch: (options) ->
+		options || (options = {});
+		options.success = => @id = @get('key').key
+		super options
+
+	url: ->
+		base = @urlRoot
+		return base if @isNew() 
+		return base + encodeURIComponent(@id)
+
+
+class NodeCollection extends Backbone.Collection
+
+	model: Node
 
 	load: (key) ->
-		target = if key then "?node=#key" else ""
-		return $.get(
-			"/node/get#target",
-			(data) => 
-				@data = data
-				@post_load()
-			,
-			'json'
-		)
+		data = if key then {id: key} else {}
+		node = new @model data
+		node_view = new NodeView model: node
 
-	save: ->
-		return $.post(
-			"/node/save",
-			JSON.stringify(@data),
-			(data) => @data = data,
-			'json'
-		)
-
-	post_load: () ->
-		# TODO: recurse into children
-		@display_impl = new Display this, @parent
-
-	display: (parent) ->
-		parent.append(@display_impl.render())
+		node.fetch()
+		@add(node)
+		# TODO: where to tack this onto the DOM
+		$('body').append(node_view.el)
 
 
-# Document ready deferred
-drd = $.Deferred()
 
-# Load the root node
-root_node = new Node
-def_load = root_node.load()
-
-drd.done( -> 
-	# Execute these on document.ready
-	def_load.done( ->
-		root_node.display($('body')) 
-	)
-)
+window.node = new Node {}
+window.node_collection = new NodeCollection
 
 $(document).ready( ->
-	drd.resolve()
+	# Load the root node
+	node_collection.load()
 )
