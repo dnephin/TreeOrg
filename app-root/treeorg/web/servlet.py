@@ -60,12 +60,14 @@ class NodeServlet(Servlet):
 	]
 
 	# TODO: filter reserved kwargs (key_name, id, parent, etc)
+	# TODO: strip off children
 
 	# TODO: logged in decorator
-	def POST(self, key):
+	def PUT(self, key):
 		user = users.get_current_user()
 		# TODO: handle errors?
 		new_node = util.json_dec(web.data())
+		debug(new_node)
 		# Check old node belongs to this user
 		old_node = models.Node.get(new_node.key())
 		assert old_node.user == user
@@ -77,22 +79,26 @@ class NodeServlet(Servlet):
 		user = users.get_current_user()
 
 		if not key:
-			query = models.Node.all()
-			query.filter('user =', user)
-			query.filter('root_node =', True)
-			node = query.fetch(limit=1)
+			node = models.Node.get_root_for_user(user)
 
 			# First visit
 			if not node:
-				node = models.Node.for_user(user, value='root', root_node=True)
+				node = models.Node.new_for_user(user, value='root', root_node=True)
 				node.put()
-			else:
-				node = node[0]
 		else:
-			node = models.Node.get(key)
+			node = models.Node.get_with_children(key)
 			if not node or node.user != user:
 				raise web.notfound()
 
 		return util.json_enc(node)
 
-	PUT = POST
+	def POST(self, key):
+		assert not key
+		user = users.get_current_user()
+		# TODO: handle errors?
+		node_data = util.json_dec(web.data())
+		assert not node_data.get('key')
+
+		new_node = models.Node.new_for_user(user, **node_data)
+		new_node.put()
+		return util.json_enc(new_node)
