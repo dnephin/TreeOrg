@@ -31,19 +31,23 @@ class ParentNodeView extends NodeView
 
 	render: =>
 		$(@el).html(@build_value())
-		for child_view in @build_children()
-			$(@el).after(child_view.render())
+		@build_children()
+		@build_empty_node()
 		return @el
 
 	build_children: ->
-		@children = []
 		for child_node in @model.get('children')
-			@children.push(new ChildNodeView
-				model: new Node child_node
-			)
+			child_view = new ChildNodeView model: new Node child_node
+			@add_child_to_dom(child_view.render())
+			child_view
 
-		@children.push(new EmptyNodeView parent_view: this)
-		return @children
+	build_empty_node: ->
+		empty_node = new EmptyNodeView parent_view: this
+		@add_child_to_dom(empty_node.render())
+		empty_node
+
+	add_child_to_dom: (child) ->
+		$(@el).parent().append(child)
 
 
 class EmptyNodeView extends NodeView
@@ -54,6 +58,8 @@ class EmptyNodeView extends NodeView
 		)
 		super options
 
+	# TODO: replace with ChildNode after save
+
 class ChildNodeView extends NodeView
 
 	className: 'node child_display'
@@ -63,8 +69,12 @@ class Node extends Backbone.Model
 
 	urlRoot: '/node/'
 
+	initialize: (options) ->
+		if options.key
+			@id = options.key.key
+
 	fetch: (options) ->
-		options || (options = {})
+		options or= {}
 		options.success = => @id = @get('key').key
 		super options
 

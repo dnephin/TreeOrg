@@ -67,7 +67,6 @@ class NodeServlet(Servlet):
 		user = users.get_current_user()
 		# TODO: handle errors?
 		new_node = util.json_dec(web.data())
-		debug(new_node)
 		# Check old node belongs to this user
 		old_node = models.Node.get(new_node.key())
 		assert old_node.user == user
@@ -97,6 +96,7 @@ class NodeServlet(Servlet):
 		user = users.get_current_user()
 		# TODO: handle errors?
 		node_data = util.json_dec(web.data())
+		debug(node_data)
 		assert not node_data.get('key')
 
 		new_node = models.Node.new_for_user(user, **node_data)

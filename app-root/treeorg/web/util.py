@@ -90,7 +90,6 @@ def decode_object_hook(obj):
 		cls = getattr(models, model_type)
 		del obj['__type']
 		del obj['__model_type']
-		web.debug(obj)
 		obj_inst = cls(**obj)
 		return obj_inst
 
