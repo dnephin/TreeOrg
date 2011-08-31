@@ -1,4 +1,79 @@
 
+class NodeStateBase
+
+	constructor: (@view, @parent_view) ->
+		@model = @view.model
+		@el = @view.el
+
+	render: =>
+		$(@el).html(@build_value())
+
+	update: ->
+		@model.set 'value': $(@el).children('.value').val()
+		@model.save()
+
+	focus: ->
+
+	build_value: ->
+		$("""<input type="text">""")
+			.addClass('value')
+			.val(@model.get('value'))
+
+
+class NodeStateParent extends NodeStateBase
+
+	render: =>
+		super
+		@build_children()
+		@build_empty_node()
+		return @el
+
+	build_children: ->
+		for child_node in @model.get('children')
+			child_view = new NodeView(
+				model: new Node(child_node)
+				state: NodeState.child
+				parent_view: @view
+			)
+			@add_child_to_dom(child_view.render())
+
+	build_empty_node: ->
+		empty_node = new NodeView(
+			state: NodeState.empty
+			parent_view: @view
+		)
+		@add_child_to_dom(empty_node.render())
+
+	add_child_to_dom: (child) ->
+		$(@el).parent().append(child)
+
+
+class NodeStateEmpty extends NodeStateBase
+
+	constructor: ->
+		super
+		@model = new Node(
+			parent_node: @parent_view.model.get('key')
+		)
+		@view.model = @model
+
+	update: ->
+		super
+		@view.state = new NodeState.child(@view)
+		# This assumes a lot...
+		@parent_view.state.build_empty_node()
+
+class NodeStateChild extends NodeStateBase
+
+
+window.NodeState =
+	# Enumeration of states taken by a NodeView
+	
+	active: null
+	parent: NodeStateParent
+	child: NodeStateChild
+	empty: NodeStateEmpty
+
 
 class NodeView extends Backbone.View
 
@@ -6,63 +81,27 @@ class NodeView extends Backbone.View
 
 	className: 'node default_display'
 
-	initialize: (options) ->
+	initialize: (options) =>
+		# select Impl for state
+		options.state or= NodeState.parent
+		@state = new options.state(this, options.parent_view)
+
 		@model.bind('change', @render)
 		@model.view = this
 		super options
 
 	events:
-		'change .value': "update",
-
-	render: =>
-		$(@el).html(@build_value())
-
-	build_value: ->
-		$("""<input type="text">""")
-			.addClass('value')
-			.val(@model.get('value'))
+		'change .value': 'update',
+		'focus': 'focus',
 
 	update: ->
-		@model.set 'value': $(@el).children('.value').val()
-		@model.save()
-
-
-class ParentNodeView extends NodeView
+		@state.update()
 
 	render: =>
-		$(@el).html(@build_value())
-		@build_children()
-		@build_empty_node()
-		return @el
+		@state.render()
 
-	build_children: ->
-		for child_node in @model.get('children')
-			child_view = new ChildNodeView model: new Node child_node
-			@add_child_to_dom(child_view.render())
-			child_view
-
-	build_empty_node: ->
-		empty_node = new EmptyNodeView parent_view: this
-		@add_child_to_dom(empty_node.render())
-		empty_node
-
-	add_child_to_dom: (child) ->
-		$(@el).parent().append(child)
-
-
-class EmptyNodeView extends NodeView
-
-	initialize: (options) ->
-		@model = new Node(
-			parent_node: options.parent_view.model.get('key')
-		)
-		super options
-
-	# TODO: replace with ChildNode after save
-
-class ChildNodeView extends NodeView
-
-	className: 'node child_display'
+	focus: ->
+		@state.focus()
 
 
 class Node extends Backbone.Model
@@ -88,7 +127,7 @@ class NodeController
 
 	load_root: () ->
 		node = new Node
-		node_view = new ParentNodeView model: node
+		node_view = new NodeView model: node
 		$('body').append(node_view.el)
 		node.fetch()
 
