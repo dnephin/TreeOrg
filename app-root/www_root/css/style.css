@@ -72,8 +72,7 @@ td { vertical-align: top; }
 	width: 300px;
 }
 
-.default_display INPUT.value
-{
+.default_display INPUT.value {
 	padding: 3px;
 	margin: 2px;
 	font-size: 1.2em;
@@ -81,6 +80,9 @@ td { vertical-align: top; }
 	width: 250px;
 }
 
+.child_container {
+	margin-left: 30px;
+}
 
 /* ==|== non-semantic helper classes ======================================== */
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; }

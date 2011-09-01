@@ -26,6 +26,7 @@ def base (content):
     extend_([u'  <link rel="stylesheet" href="css/style.css">\n'])
     extend_([u'  <!-- end CSS-->\n'])
     extend_([u'\n'])
+    extend_([u'  <link rel="shortcut icon" href="/favicon.gif" />\n'])
     extend_([u'  <script src="js/libs/modernizr-2.0.6.min.js"></script>\n'])
     extend_([u'</head>\n'])
     extend_([u'\n'])

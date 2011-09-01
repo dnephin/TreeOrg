@@ -1,3 +1,5 @@
+# TODO: fix parent state redrawing children when the value is updated
+# TODO: fix double update on <enter> for new elements
 
 class NodeStateBase
 
@@ -6,27 +8,43 @@ class NodeStateBase
 		@el = @view.el
 
 	render: =>
-		$(@el).html(@build_value())
+		$(@el)
+			.html(@build_value())
+			.append(@build_focus_button())
 
 	update: ->
-		@model.set 'value': $(@el).children('.value').val()
+		@model.set 'value': @select('value').val()
 		@model.save()
 
-	focus: ->
+	focus: (e) ->
+		if e
+			e.preventDefault()
 
 	build_value: ->
-		$("""<input type="text">""")
+		$('<input type="text">')
 			.addClass('value')
 			.val(@model.get('value'))
+
+	build_focus_button: ->
+		$('<a href="#">v</a>').addClass('focusme')
+
+	select: (ele) ->
+		switch ele
+			when 'value' then $(@el).children('.value')
+			when 'focus' then $(@el).children('.focusme')
+			when 'child_container' then $(@el).next('.child_container')
 
 
 class NodeStateParent extends NodeStateBase
 
-	render: =>
-		super
+	focus: (e) ->
+		super e
 		@build_children()
 		@build_empty_node()
-		return @el
+
+	render: (e) ->
+		super e
+		$(@el).after($('<div>').addClass('child_container'))
 
 	build_children: ->
 		for child_node in @model.get('children')
@@ -43,9 +61,17 @@ class NodeStateParent extends NodeStateBase
 			parent_view: @view
 		)
 		@add_child_to_dom(empty_node.render())
+		empty_node.state.select('value').focus()
 
 	add_child_to_dom: (child) ->
-		$(@el).parent().append(child)
+		@select('child_container').append(child)
+
+
+class NodeStateActive extends NodeStateParent
+
+	render: (e) ->
+		super e
+		@focus()
 
 
 class NodeStateEmpty extends NodeStateBase
@@ -63,13 +89,16 @@ class NodeStateEmpty extends NodeStateBase
 		# This assumes a lot...
 		@parent_view.state.build_empty_node()
 
+	build_focus_button: ->
+		# Empty node does not have a focus button
+
 class NodeStateChild extends NodeStateBase
 
 
 window.NodeState =
 	# Enumeration of states taken by a NodeView
 	
-	active: null
+	active: NodeStateActive
 	parent: NodeStateParent
 	child: NodeStateChild
 	empty: NodeStateEmpty
@@ -83,7 +112,7 @@ class NodeView extends Backbone.View
 
 	initialize: (options) =>
 		# select Impl for state
-		options.state or= NodeState.parent
+		options.state or= NodeState.active
 		@state = new options.state(this, options.parent_view)
 
 		@model.bind('change', @render)
@@ -92,30 +121,31 @@ class NodeView extends Backbone.View
 
 	events:
 		'change .value': 'update',
-		'focus': 'focus',
+		'click .focusme': 'focus',
 
-	update: ->
-		@state.update()
+	update: (e) ->
+		@state.update(e)
 
-	render: =>
-		@state.render()
+	render: (e) =>
+		@state.render(e)
 
-	focus: ->
-		@state.focus()
+	focus: (e) ->
+		@state.focus(e)
 
 
 class Node extends Backbone.Model
 
+	# TODO: track if children are loaded, and load when it hasn't attmpted to
+
 	urlRoot: '/node/'
 
-	initialize: (options) ->
-		if options.key
-			@id = options.key.key
+	initialize: (data) ->
+		if data.key
+			@id = data.key.key
 
-	fetch: (options) ->
-		options or= {}
-		options.success = => @id = @get('key').key
-		super options
+	parse: (resp, xhr) ->
+		@id = resp.key.key
+		return resp
 
 	url: ->
 		base = @urlRoot
