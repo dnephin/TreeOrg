@@ -1,5 +1,3 @@
-# TODO: fix parent state redrawing children when the value is updated
-# TODO: fix double update on <enter> for new elements
 
 class NodeStateBase
 
@@ -89,8 +87,12 @@ class NodeStateEmpty extends NodeStateBase
 		# This assumes a lot...
 		@parent_view.state.build_empty_node()
 
+	# Empty node does not have a focus button
 	build_focus_button: ->
-		# Empty node does not have a focus button
+
+	build_value: ->
+		$('<input type="text">')
+			.addClass('value')
 
 class NodeStateChild extends NodeStateBase
 
@@ -117,6 +119,7 @@ class NodeView extends Backbone.View
 
 		@model.bind('change', @render)
 		@model.view = this
+		@is_changing = false
 		super options
 
 	events:
@@ -124,7 +127,13 @@ class NodeView extends Backbone.View
 		'click .focusme': 'focus',
 
 	update: (e) ->
+		# is_changing deals with a problem where hitting <enter> causes the
+		# change event to fire twice.  This limits the event to firing once.
+		if @is_changing
+			return
+		@is_changing = true
 		@state.update(e)
+		@is_changing = false
 
 	render: (e) =>
 		@state.render(e)
