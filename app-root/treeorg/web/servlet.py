@@ -55,9 +55,7 @@ class Tree(Servlet):
 
 class NodeServlet(Servlet):
 	url_base = 'node'
-	extra = [
-		'([^/]*)'
-	]
+	action = '([^/]*)'
 
 	# TODO: filter reserved kwargs (key_name, id, parent, etc)
 	# TODO: strip off children
@@ -102,3 +100,18 @@ class NodeServlet(Servlet):
 		new_node = models.Node.new_for_user(user, **node_data)
 		new_node.put()
 		return util.json_enc(new_node)
+
+class NodeChildrenServlet(Servlet):
+	url_base = 'children'
+	action = '([^/]*)'
+
+	# TODO: logged in decorator
+	def GET(self, key):
+		user = users.get_current_user()
+		children = models.Node.get_children(db.Key(key))
+		for child in children:
+			assert child.user == user
+		return util.json_enc(children)
+
+
+

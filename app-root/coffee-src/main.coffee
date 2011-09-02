@@ -106,9 +106,9 @@ class NodeStateEmpty extends NodeStateBase
 		@view.model = @model
 
 	update: ->
-		super
 		@view.changeState NodeState.closed
-		# This assumes a lot...
+		super
+		# This is messy... and broken
 		@parentView.state.buildEmptyNode()
 
 	# Empty node does not have a focus button
@@ -167,8 +167,9 @@ class NodeView extends Backbone.View
 
 
 class Node extends Backbone.Model
-
-	# TODO: track if children are loaded, and load when it hasn't attmpted to
+	###
+	 Node Model
+	###
 
 	urlRoot: '/node/'
 
@@ -179,25 +180,58 @@ class Node extends Backbone.Model
 
 	parse: (resp, xhr) ->
 		@id = resp.key.key
-		resp.children = for child in resp.children
-			new Node child
+		if resp.children
+			resp.children = @loadChildren resp.children
 		return resp
+
+	save: (attrs, options) ->
+		# Set id to pending if this is a new object
+		# This may be super broken
+		super attrs, options
+		if @isNew()
+			@id = 'pending'
 
 	url: ->
 		base = @urlRoot
 		return base if @isNew()
 		return base + encodeURIComponent(@id)
 
+	childrenUrl: ->
+		'/children/' + encodeURIComponent(@id)
+
+	loadChildren: (children) ->
+		@childrenLoaded = true
+		for child in children
+			new Node child
+
+	fetchChildren: ->
+		children = null
+		$.ajax(
+			type: 'GET'
+			dataType: 'json'
+			contentType: 'application/json'
+			url: @childrenUrl()
+			async: false
+			success: (data, textStatus, xhr) ->
+				children = data
+		)
+		return children
+
 	getChildren: ->
+		if not @childrenLoaded
+			children = @fetchChildren()
+			@set({children: @loadChildren children}, {silent: true})
+			
 		if not @get('children')
 			@set({children: []}, {silent: true})
+
 		return @get('children')
 
 	getEmptyChild: ->
 		last = _.last(@getChildren())
 		if last and last.isNew()
 			return last
-		new_child = new Node parentNode: this
+		new_child = new Node parentNode: @get('key')
 		@getChildren().push(new_child)
 		return new_child
 
