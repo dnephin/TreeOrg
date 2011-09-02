@@ -74,9 +74,10 @@ class NodeStateOpen extends NodeStateParent
 		@view.changeState NodeState.parent
 
 	buildChildren: ->
-		for childNode in @model.get('children')
+		for childNode in @model.getChildren()
+			continue if childNode.isNew()
 			childView = new NodeView(
-				model: new Node(childNode)
+				model: childNode
 				state: NodeState.closed
 				parentView: @view
 			)
@@ -101,9 +102,7 @@ class NodeStateEmpty extends NodeStateBase
 
 	constructor: ->
 		super
-		@model = new Node(
-			parentNode: @parentView.model.get('key')
-		)
+		@model = @parentView.model.getEmptyChild()
 		@view.model = @model
 
 	update: ->
@@ -174,17 +173,33 @@ class Node extends Backbone.Model
 	urlRoot: '/node/'
 
 	initialize: (data) ->
+		@childrenLoaded = false
 		if data.key
 			@id = data.key.key
 
 	parse: (resp, xhr) ->
 		@id = resp.key.key
+		resp.children = for child in resp.children
+			new Node child
 		return resp
 
 	url: ->
 		base = @urlRoot
 		return base if @isNew()
 		return base + encodeURIComponent(@id)
+
+	getChildren: ->
+		if not @get('children')
+			@set({children: []}, {silent: true})
+		return @get('children')
+
+	getEmptyChild: ->
+		last = _.last(@getChildren())
+		if last and last.isNew()
+			return last
+		new_child = new Node parentNode: this
+		@getChildren().push(new_child)
+		return new_child
 
 
 class NodeController
