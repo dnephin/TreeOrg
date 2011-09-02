@@ -1,14 +1,17 @@
 
 class NodeStateBase
+	###
+	 Base class for all NodeStates
+	###
 
-	constructor: (@view, @parent_view) ->
+	constructor: (@view, @parentView) ->
 		@model = @view.model
 		@el = @view.el
 
 	render: =>
 		$(@el)
-			.html(@build_value())
-			.append(@build_focus_button())
+			.html(@buildValue())
+			.append(@buildFocusButton())
 
 	update: ->
 		@model.set 'value': @select('value').val()
@@ -18,12 +21,12 @@ class NodeStateBase
 		if e
 			e.preventDefault()
 
-	build_value: ->
+	buildValue: ->
 		$('<input type="text">')
 			.addClass('value')
 			.val(@model.get('value'))
 
-	build_focus_button: ->
+	buildFocusButton: ->
 		$('<a href="#">v</a>').addClass('focusme')
 
 	select: (ele) ->
@@ -34,75 +37,94 @@ class NodeStateBase
 
 
 class NodeStateParent extends NodeStateBase
+	###
+	 A parent node that has been opened already.
+	###
+
+	addChildToDom: (child) ->
+		@select('child_container').append(child)
 
 	focus: (e) ->
 		super e
-		@build_children()
-		@build_empty_node()
+		@select('child_container').remove()
+		@view.changeState NodeState.closed
+		@view.render()
+
+	buildFocusButton: ->
+		$('<a href="#">^</a>').addClass('focusme')
+
+	buildEmptyNode: ->
+		emptyNode = new NodeView(
+			state: NodeState.empty
+			parentView: @view
+		)
+		@addChildToDom(emptyNode.render())
+		emptyNode.state.select('value').focus()
+
+class NodeStateOpen extends NodeStateParent
+	###
+	 A parent node opening.
+	###
 
 	render: (e) ->
 		super e
 		$(@el).after($('<div>').addClass('child_container'))
+		@buildChildren()
+		@buildEmptyNode()
+		@view.changeState NodeState.parent
 
-	build_children: ->
-		for child_node in @model.get('children')
-			child_view = new NodeView(
-				model: new Node(child_node)
-				state: NodeState.child
-				parent_view: @view
+	buildChildren: ->
+		for childNode in @model.get('children')
+			childView = new NodeView(
+				model: new Node(childNode)
+				state: NodeState.closed
+				parentView: @view
 			)
-			@add_child_to_dom(child_view.render())
-
-	build_empty_node: ->
-		empty_node = new NodeView(
-			state: NodeState.empty
-			parent_view: @view
-		)
-		@add_child_to_dom(empty_node.render())
-		empty_node.state.select('value').focus()
-
-	add_child_to_dom: (child) ->
-		@select('child_container').append(child)
+			@addChildToDom(childView.render())
 
 
-class NodeStateActive extends NodeStateParent
+class NodeStateClosed extends NodeStateBase
+	###
+	 A parent node in closed state.
+	###
 
-	render: (e) ->
+	focus: (e) ->
 		super e
-		@focus()
+		@view.changeState NodeState.open
+		@view.render()
 
 
 class NodeStateEmpty extends NodeStateBase
+	###
+	 An empty node that will become a new node when a value is set.
+	###
 
 	constructor: ->
 		super
 		@model = new Node(
-			parent_node: @parent_view.model.get('key')
+			parentNode: @parentView.model.get('key')
 		)
 		@view.model = @model
 
 	update: ->
 		super
-		@view.state = new NodeState.child(@view)
+		@view.changeState NodeState.closed
 		# This assumes a lot...
-		@parent_view.state.build_empty_node()
+		@parentView.state.buildEmptyNode()
 
 	# Empty node does not have a focus button
-	build_focus_button: ->
+	buildFocusButton: ->
 
-	build_value: ->
-		$('<input type="text">')
-			.addClass('value')
-
-class NodeStateChild extends NodeStateBase
+	buildValue: ->
+		$('<input type="text">').addClass('value')
 
 
 window.NodeState =
 	# Enumeration of states taken by a NodeView
 	
-	active: NodeStateActive
+	open: NodeStateOpen
 	parent: NodeStateParent
-	child: NodeStateChild
+	closed: NodeStateClosed
 	empty: NodeStateEmpty
 
 
@@ -114,26 +136,29 @@ class NodeView extends Backbone.View
 
 	initialize: (options) =>
 		# select Impl for state
-		options.state or= NodeState.active
-		@state = new options.state(this, options.parent_view)
+		options.state or= NodeState.open
+		@state = new options.state(this, options.parentView)
 
 		@model.bind('change', @render)
 		@model.view = this
-		@is_changing = false
+		@isChanging = false
 		super options
+
+	changeState: (state) ->
+		@state = new state(this)
 
 	events:
 		'change .value': 'update',
 		'click .focusme': 'focus',
 
 	update: (e) ->
-		# is_changing deals with a problem where hitting <enter> causes the
+		# isChanging deals with a problem where hitting <enter> causes the
 		# change event to fire twice.  This limits the event to firing once.
-		if @is_changing
+		if @isChanging
 			return
-		@is_changing = true
+		@isChanging = true
 		@state.update(e)
-		@is_changing = false
+		@isChanging = false
 
 	render: (e) =>
 		@state.render(e)
@@ -164,16 +189,16 @@ class Node extends Backbone.Model
 
 class NodeController
 
-	load_root: () ->
+	loadRoot: () ->
 		node = new Node
-		node_view = new NodeView model: node
-		$('body').append(node_view.el)
+		nodeView = new NodeView model: node
+		$('body').append(nodeView.el)
 		node.fetch()
 
 
-window.node_controller = new NodeController
+window.nodeController = new NodeController
 
 $(document).ready( ->
 	# Load the root node
-	node_controller.load_root()
+	nodeController.loadRoot()
 )

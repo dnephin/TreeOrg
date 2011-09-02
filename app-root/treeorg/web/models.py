@@ -18,7 +18,6 @@ class Node(db.Expando):
 	user = db.UserProperty(auto_current_user=True)
 	root_node = db.BooleanProperty(default=False)
 	value = db.StringProperty()
-	parent_node = db.SelfReferenceProperty()
 	children = TransientProperty()
 	# time created
 	# time updated
@@ -56,6 +55,6 @@ class Node(db.Expando):
 	@classmethod
 	def get_children(cls, key):
 		query = cls.all()
-		query.filter('parent_node =', key)
+		query.filter('parentNode =', key)
 		return list(query)
 

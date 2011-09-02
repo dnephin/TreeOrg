@@ -113,10 +113,6 @@ def index (context):
     extend_([u'\n'])
     self['title'] = join_(u'Explore the Tree')
     extend_([u'\n'])
-    extend_([u'<div>You are ', escape_(context.user, True), u'</div>\n'])
-    extend_([u'What is this about?\n'])
-    extend_([u'\n'])
-    extend_([u'\n'])
 
     return self
 
