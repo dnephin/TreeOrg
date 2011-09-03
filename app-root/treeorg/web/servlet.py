@@ -110,7 +110,7 @@ class NodeChildrenServlet(Servlet):
 	# TODO: logged in decorator
 	def GET(self, key):
 		user = users.get_current_user()
-		children = models.Node.get_children(db.Key(key))
+		children = models.Node.get_children([db.Key(key)])
 		for child in children:
 			assert child.user == user
 		return json.enc(children)

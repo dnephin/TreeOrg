@@ -9,9 +9,13 @@ class NodeStateBase
 		@el = @view.el
 
 	render: =>
-		$(@el)
-			.html(@buildValue())
-			.append(@buildFocusButton())
+		cc = @buildChildContainer()
+		div = $(@view.make('div', class: 'disp', id: @view.cid))
+		div.append(@buildValue())
+		div.append(@buildFocusButton())
+		$(@el).html(div)
+		$(@el).append(cc)
+		return $(@el)
 
 	update: ->
 		@model.set 'value': @select('value').val()
@@ -22,18 +26,23 @@ class NodeStateBase
 			e.preventDefault()
 
 	buildValue: ->
-		$('<input type="text">')
-			.addClass('value')
-			.val(@model.get('value'))
+		$('<input type="text">').addClass('value').val(@model.get('value'))
 
 	buildFocusButton: ->
 		$('<a href="#">v</a>').addClass('focusme')
 
+	buildChildContainer: ->
+		if @select('child_container').length
+			childContainer = @select('child_container')
+		else
+			childContainer = $('<div>').addClass('child_container')
+		return childContainer
+
 	select: (ele) ->
 		switch ele
-			when 'value' then $(@el).children('.value')
-			when 'focus' then $(@el).children('.focusme')
-			when 'child_container' then $(@el).next('.child_container')
+			when 'value' then @view.$(' > .disp > .value')
+			when 'focus' then @view.$(' > .disp > .focusme')
+			when 'child_container' then @view.$(' > .child_container')
 
 
 class NodeStateOpen extends NodeStateBase
@@ -46,7 +55,6 @@ class NodeStateOpen extends NodeStateBase
 
 	focus: (e) ->
 		super e
-		@select('child_container').remove()
 		@view.changeState NodeState.closed
 		@view.render()
 
@@ -61,16 +69,21 @@ class NodeStateOpen extends NodeStateBase
 		@addChildToDom(emptyNode.render())
 		emptyNode.state.select('value').focus()
 
+
+class NodeStateOpening extends NodeStateOpen
+
 	render: (e) ->
 		super e
-		if not @select('child_container')
-			$(@el).after($('<div>').addClass('child_container'))
-			@buildChildren()
-			@buildEmptyNode()
+		@buildChildren()
+		@buildEmptyNode()
+		@view.changeState(NodeState.open)
+		return $(@el)
 
 	buildChildren: ->
 		for childNode in @model.getChildren()
+			# Don't display the empty if it's already included in children
 			continue if childNode.isNew()
+
 			childView = new NodeView(
 				model: childNode
 				parentView: @view
@@ -86,9 +99,11 @@ class NodeStateClosed extends NodeStateBase
 	focus: (e) ->
 		super e
 		# TODO: This needs to be atomic, is it ?
-		@view.changeState NodeState.open
+		@view.changeState NodeState.opening
 		@view.state.render()
 
+	buildChildContainer: ->
+		return ''
 
 class NodeStateEmpty extends NodeStateBase
 	###
@@ -120,6 +135,7 @@ class NodeStateEmpty extends NodeStateBase
 window.NodeState =
 	
 	open: NodeStateOpen			# opening state
+	opening: NodeStateOpening
 	closed: NodeStateClosed		# closed state
 	empty: NodeStateEmpty		# empty state
 
@@ -143,19 +159,20 @@ class NodeView extends Backbone.View
 		super options
 	
 	setDefaultState: (model) ->
-		if model.childrenLoaded
-			@state = new NodeState.open this
-			@state.render()
+		if model.childrenLoaded and model.getChildren().length
+			@state = new NodeState.opening this
 		else
 			@state = new NodeState.closed this
-			@state.render()
 
 	changeState: (state) ->
 		@state = new state(this)
 
-	events:
-		'change .value': 'update',
-		'click .focusme': 'focus',
+	events: ->
+		viewId = '#' + @cid
+		events = {}
+		events["change " + viewId + " .value"] = 'update'
+		events["click " + viewId + " .focusme"] = 'focus'
+		return events
 
 	update: (e) ->
 		# isChanging deals with a problem where hitting <enter> causes the
@@ -171,6 +188,10 @@ class NodeView extends Backbone.View
 
 	focus: (e) ->
 		@state.focus(e)
+
+#	renderChildren: ->
+#		for node in @model.getChildren()
+#			node.view.render()
 
 
 class Node extends Backbone.Model
@@ -209,8 +230,6 @@ class Node extends Backbone.Model
 
 	loadChildren: (children) ->
 		@childrenLoaded = true
-		if not children
-			return []
 		for child in children
 			node = new Node child
 			cchildren = node.get('children')
@@ -219,17 +238,6 @@ class Node extends Backbone.Model
 				node.set({'children': cnodes}, silent: true)
 			node
 	
-	fetch: (options) ->
-		depth = options.data and options.data.depth or 1
-#	options.success = =>
-#		pnodes = [this]
-#		for num in [0..depth]
-#			for pn in pnodes
-#				pn.children = pn.loadChildren(pn.children)
-#			pnodes = [pn for pn in pnodes]
-				
-		super options
-
 	fetchChildren: ->
 		children = null
 		$.ajax(
@@ -251,7 +259,9 @@ class Node extends Backbone.Model
 		if not @get('children')
 			@set({children: []}, {silent: true})
 
-		return @get('children')
+		for child in @get('children')
+			if not child.isNew()
+				child
 
 	getEmptyChild: ->
 		last = _.last(@getChildren())
@@ -266,11 +276,10 @@ class NodeController
 
 	loadRoot: () ->
 		node = new Node
-		nodeView =  new NodeView model: node
+		nodeView =  new NodeView model: node, state: NodeState.opening
 		$('body').append(nodeView.el)
-		node.fetch( data: {depth: 4}, success: ->
-			nodeView.render()
-		)
+		node.fetch( data: {depth: 2} )
+		window.node = node
 
 
 window.nodeController = new NodeController

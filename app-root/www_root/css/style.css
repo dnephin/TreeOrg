@@ -65,14 +65,14 @@ td { vertical-align: top; }
 /* ==|== primary styles =====================================================
    Author: 
    ========================================================================== */
-.default_display {
+.default_display > .disp {
 	padding; 3px;
 	margin: 2px;
 	border: solid 1px #e9e9e9;
 	width: 300px;
 }
 
-.default_display INPUT.value {
+.default_display > .disp > .value {
 	padding: 3px;
 	margin: 2px;
 	font-size: 1.2em;

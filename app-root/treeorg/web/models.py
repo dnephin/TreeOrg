@@ -69,6 +69,7 @@ class Node(db.Expando):
 		if not keys:
 			return []
 		query = cls.all()
+		debug(keys)
 		query.filter('parentNode IN', keys)
 		return list(query)
 
