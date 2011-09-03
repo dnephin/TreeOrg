@@ -1,9 +1,12 @@
+# TODO: Changing a value in a parent redraws the node, which changes the ID, 
+# which loses the delegated events
+
 
 class NodeStateBase
 	###
 	 Base class for all NodeStates
 	###
-
+	
 	constructor: (@view, @parentView) ->
 		@model = @view.model
 		@el = @view.el
@@ -81,9 +84,6 @@ class NodeStateOpening extends NodeStateOpen
 
 	buildChildren: ->
 		for childNode in @model.getChildren()
-			# Don't display the empty if it's already included in children
-			continue if childNode.isNew()
-
 			childView = new NodeView(
 				model: childNode
 				parentView: @view
@@ -189,96 +189,14 @@ class NodeView extends Backbone.View
 	focus: (e) ->
 		@state.focus(e)
 
-#	renderChildren: ->
-#		for node in @model.getChildren()
-#			node.view.render()
-
-
-class Node extends Backbone.Model
-	###
-	 Node Model
-	###
-
-	urlRoot: '/node/'
-
-	initialize: (data) ->
-		@childrenLoaded = false
-		if data.key
-			@id = data.key.key
-
-	parse: (resp, xhr) ->
-		@id = resp.key.key
-		if resp.children
-			resp.children = @loadChildren resp.children
-				
-		return resp
-
-	save: (attrs, options) ->
-		# Set id to pending if this is a new object
-		# This may be super broken
-		super attrs, options
-		if @isNew()
-			@id = 'pending'
-
-	url: ->
-		base = @urlRoot
-		return base if @isNew()
-		return base + encodeURIComponent(@id)
-
-	childrenUrl: ->
-		'/children/' + encodeURIComponent(@id)
-
-	loadChildren: (children) ->
-		@childrenLoaded = true
-		for child in children
-			node = new Node child
-			cchildren = node.get('children')
-			if cchildren
-				cnodes = node.loadChildren(cchildren)
-				node.set({'children': cnodes}, silent: true)
-			node
-	
-	fetchChildren: ->
-		children = null
-		$.ajax(
-			type: 'GET'
-			dataType: 'json'
-			contentType: 'application/json'
-			url: @childrenUrl()
-			async: false
-			success: (data, textStatus, xhr) ->
-				children = data
-		)
-		return children
-
-	getChildren: ->
-		if not @childrenLoaded
-			children = @fetchChildren()
-			@set({children: @loadChildren children})
-			
-		if not @get('children')
-			@set({children: []}, {silent: true})
-
-		for child in @get('children')
-			if not child.isNew()
-				child
-
-	getEmptyChild: ->
-		last = _.last(@getChildren())
-		if last and last.isNew()
-			return last
-		new_child = new Node parentNode: @get('key')
-		@getChildren().push(new_child)
-		return new_child
-
 
 class NodeController
 
 	loadRoot: () ->
 		node = new Node
 		nodeView =  new NodeView model: node, state: NodeState.opening
-		$('body').append(nodeView.el)
-		node.fetch( data: {depth: 2} )
+		$('#container').append(nodeView.el)
+		node.fetch( data: {depth: 4} )
 		window.node = node
 
 
