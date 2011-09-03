@@ -1,6 +1,3 @@
-# TODO: Changing a value in a parent redraws the node, which changes the ID, 
-# which loses the delegated events
-
 
 class NodeStateBase
 	###
@@ -34,13 +31,7 @@ class NodeStateBase
 	buildFocusButton: ->
 		$('<a href="#">v</a>').addClass('focusme')
 
-	buildChildContainer: ->
-		if @select('child_container').length
-			childContainer = @select('child_container')
-		else
-			childContainer = $('<div>').addClass('child_container')
-		return childContainer
-
+	buildChildContainer: -> ''
 	select: (ele) ->
 		switch ele
 			when 'value' then @view.$(' > .disp > .value')
@@ -72,14 +63,10 @@ class NodeStateOpen extends NodeStateBase
 		@addChildToDom(emptyNode.render())
 		emptyNode.state.select('value').focus()
 
-
-class NodeStateOpening extends NodeStateOpen
-
 	render: (e) ->
 		super e
 		@buildChildren()
 		@buildEmptyNode()
-		@view.changeState(NodeState.open)
 		return $(@el)
 
 	buildChildren: ->
@@ -90,6 +77,9 @@ class NodeStateOpening extends NodeStateOpen
 			)
 			@addChildToDom(childView.render())
 
+	buildChildContainer: ->
+		$('<div>').addClass('child_container')
+
 
 class NodeStateClosed extends NodeStateBase
 	###
@@ -99,11 +89,10 @@ class NodeStateClosed extends NodeStateBase
 	focus: (e) ->
 		super e
 		# TODO: This needs to be atomic, is it ?
-		@view.changeState NodeState.opening
+		@view.changeState NodeState.open
 		@view.state.render()
 
-	buildChildContainer: ->
-		return ''
+	buildChildContainer: -> ''
 
 class NodeStateEmpty extends NodeStateBase
 	###
@@ -135,7 +124,6 @@ class NodeStateEmpty extends NodeStateBase
 window.NodeState =
 	
 	open: NodeStateOpen			# opening state
-	opening: NodeStateOpening
 	closed: NodeStateClosed		# closed state
 	empty: NodeStateEmpty		# empty state
 
@@ -160,7 +148,7 @@ class NodeView extends Backbone.View
 	
 	setDefaultState: (model) ->
 		if model.childrenLoaded and model.getChildren().length
-			@state = new NodeState.opening this
+			@state = new NodeState.open this
 		else
 			@state = new NodeState.closed this
 
@@ -198,7 +186,7 @@ class NodeController
 
 	loadRoot: () ->
 		node = new Node
-		nodeView =  new NodeView model: node, state: NodeState.opening
+		nodeView =  new NodeView model: node, state: NodeState.open
 		$('#container').append(nodeView.el)
 		node.fetch( data: {depth: 4} )
 		window.node = node
