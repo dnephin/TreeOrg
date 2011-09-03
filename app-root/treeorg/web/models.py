@@ -24,6 +24,7 @@ class Node(db.Expando):
 	root_node = db.BooleanProperty(default=False)
 	value = db.StringProperty()
 	children = TransientProperty()
+	pNode = db.SelfReferenceProperty()
 	# time created
 	# time updated
 	
@@ -57,9 +58,12 @@ class Node(db.Expando):
 		parents = {node.key(): node}
 		for _ in range(load_depth):
 			children = cls.get_children(parents.keys())
-			map_pkey_to_children = util.build_map_lists(children, attrgetter('parentNode'))
+			map_pkey_to_children = util.build_map_lists(
+				children, 
+				lambda a: str(a.pNode.key())
+			)
 			for key, parent in parents.iteritems():
-				parent.children = map_pkey_to_children[key]
+				parent.children = map_pkey_to_children[str(key)]
 			parents = dict((cnode.key(), cnode) for cnode in children)
 
 		return node
@@ -69,7 +73,6 @@ class Node(db.Expando):
 		if not keys:
 			return []
 		query = cls.all()
-		debug(keys)
-		query.filter('parentNode IN', keys)
+		query.filter('pNode IN', keys)
 		return list(query)
 

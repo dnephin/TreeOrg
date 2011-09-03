@@ -178,15 +178,19 @@ class NodeView extends Backbone.View
 		# isChanging deals with a problem where hitting <enter> causes the
 		# change event to fire twice.  This limits the event to firing once.
 		if @isChanging
+			console.log("update[#{@model.get('value')}] cancelled (already changing)")
 			return
+		console.log("update[#{@model.get('value')}]")
 		@isChanging = true
 		@state.update(e)
 		@isChanging = false
 
 	render: (e) =>
+		console.log("render[#{@model.get('value')}]")
 		@state.render(e)
 
 	focus: (e) ->
+		console.log("focus[#{@model.get('value')}]")
 		@state.focus(e)
 
 

@@ -76,7 +76,7 @@ class NodeServlet(Servlet):
 		user = users.get_current_user()
 		# TODO: validate input
 		input = web.input()
-		depth = int(input.depth or 1)
+		depth = int(input.get('depth') or 0)
 		if not key:
 			node = models.Node.get_root_for_user(user, load_depth=depth)
 

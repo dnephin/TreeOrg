@@ -72,7 +72,7 @@ class Node extends Backbone.Model
 		last = _.last(@getChildren())
 		if last and last.isNew()
 			return last
-		new_child = new Node parentNode: @get('key')
+		new_child = new Node pNode: @get('key')
 		@getChildren().push(new_child)
 		return new_child
 
