@@ -36,7 +36,7 @@ class NodeStateBase
 			when 'child_container' then $(@el).next('.child_container')
 
 
-class NodeStateParent extends NodeStateBase
+class NodeStateOpen extends NodeStateBase
 	###
 	 A parent node that has been opened already.
 	###
@@ -61,24 +61,18 @@ class NodeStateParent extends NodeStateBase
 		@addChildToDom(emptyNode.render())
 		emptyNode.state.select('value').focus()
 
-class NodeStateOpen extends NodeStateParent
-	###
-	 A parent node opening.
-	###
-
 	render: (e) ->
 		super e
-		$(@el).after($('<div>').addClass('child_container'))
-		@buildChildren()
-		@buildEmptyNode()
-		@view.changeState NodeState.parent
+		if not @select('child_container')
+			$(@el).after($('<div>').addClass('child_container'))
+			@buildChildren()
+			@buildEmptyNode()
 
 	buildChildren: ->
 		for childNode in @model.getChildren()
 			continue if childNode.isNew()
 			childView = new NodeView(
 				model: childNode
-				state: NodeState.closed
 				parentView: @view
 			)
 			@addChildToDom(childView.render())
@@ -91,8 +85,9 @@ class NodeStateClosed extends NodeStateBase
 
 	focus: (e) ->
 		super e
+		# TODO: This needs to be atomic, is it ?
 		@view.changeState NodeState.open
-		@view.render()
+		@view.state.render()
 
 
 class NodeStateEmpty extends NodeStateBase
@@ -118,13 +113,15 @@ class NodeStateEmpty extends NodeStateBase
 		$('<input type="text">').addClass('value')
 
 
+### 
+	Map of name to state class which implements the
+	behavior for the node while in that state.
+###
 window.NodeState =
-	# Enumeration of states taken by a NodeView
 	
-	open: NodeStateOpen
-	parent: NodeStateParent
-	closed: NodeStateClosed
-	empty: NodeStateEmpty
+	open: NodeStateOpen			# opening state
+	closed: NodeStateClosed		# closed state
+	empty: NodeStateEmpty		# empty state
 
 
 class NodeView extends Backbone.View
@@ -135,13 +132,23 @@ class NodeView extends Backbone.View
 
 	initialize: (options) =>
 		# select Impl for state
-		options.state or= NodeState.open
-		@state = new options.state(this, options.parentView)
+		if options.state
+			@state = new options.state(this, options.parentView)
+		else
+			@setDefaultState(@model)
 
 		@model.bind('change', @render)
 		@model.view = this
 		@isChanging = false
 		super options
+	
+	setDefaultState: (model) ->
+		if model.childrenLoaded
+			@state = new NodeState.open this
+			@state.render()
+		else
+			@state = new NodeState.closed this
+			@state.render()
 
 	changeState: (state) ->
 		@state = new state(this)
@@ -182,6 +189,7 @@ class Node extends Backbone.Model
 		@id = resp.key.key
 		if resp.children
 			resp.children = @loadChildren resp.children
+				
 		return resp
 
 	save: (attrs, options) ->
@@ -201,8 +209,26 @@ class Node extends Backbone.Model
 
 	loadChildren: (children) ->
 		@childrenLoaded = true
+		if not children
+			return []
 		for child in children
-			new Node child
+			node = new Node child
+			cchildren = node.get('children')
+			if cchildren
+				cnodes = node.loadChildren(cchildren)
+				node.set({'children': cnodes}, silent: true)
+			node
+	
+	fetch: (options) ->
+		depth = options.data and options.data.depth or 1
+#	options.success = =>
+#		pnodes = [this]
+#		for num in [0..depth]
+#			for pn in pnodes
+#				pn.children = pn.loadChildren(pn.children)
+#			pnodes = [pn for pn in pnodes]
+				
+		super options
 
 	fetchChildren: ->
 		children = null
@@ -220,7 +246,7 @@ class Node extends Backbone.Model
 	getChildren: ->
 		if not @childrenLoaded
 			children = @fetchChildren()
-			@set({children: @loadChildren children}, {silent: true})
+			@set({children: @loadChildren children})
 			
 		if not @get('children')
 			@set({children: []}, {silent: true})
@@ -240,9 +266,11 @@ class NodeController
 
 	loadRoot: () ->
 		node = new Node
-		nodeView = new NodeView model: node
+		nodeView =  new NodeView model: node
 		$('body').append(nodeView.el)
-		node.fetch()
+		node.fetch( data: {depth: 4}, success: ->
+			nodeView.render()
+		)
 
 
 window.nodeController = new NodeController

@@ -1,4 +1,9 @@
 from google.appengine.ext import db
+from treeorg.web import util 
+from operator import attrgetter
+
+# Replace with logging
+from web import debug
 
 
 class TransientProperty(db.Property):
@@ -41,7 +46,7 @@ class Node(db.Expando):
 		return node
 
 	@classmethod
-	def get_root_for_user(cls, user):
+	def get_root_for_user(cls, user, load_depth=1):
 		query = cls.all()
 		query.filter('user =', user)
 		query.filter('root_node =', True)
@@ -49,12 +54,21 @@ class Node(db.Expando):
 		if not node:
 			return
 
-		node.children = cls.get_children(node.key())
+		parents = {node.key(): node}
+		for _ in range(load_depth):
+			children = cls.get_children(parents.keys())
+			map_pkey_to_children = util.build_map_lists(children, attrgetter('parentNode'))
+			for key, parent in parents.iteritems():
+				parent.children = map_pkey_to_children[key]
+			parents = dict((cnode.key(), cnode) for cnode in children)
+
 		return node
 
 	@classmethod
-	def get_children(cls, key):
+	def get_children(cls, keys):
+		if not keys:
+			return []
 		query = cls.all()
-		query.filter('parentNode =', key)
+		query.filter('parentNode IN', keys)
 		return list(query)
 
