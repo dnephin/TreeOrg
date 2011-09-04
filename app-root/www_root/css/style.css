@@ -116,6 +116,7 @@ header H1 {
 
 .default_display > .disp > .button:hover {
 	color: #333;
+	display: block;
 }
 
 .default_display > .disp > .focusme {

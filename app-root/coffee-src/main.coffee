@@ -30,17 +30,25 @@ class NodeStateBase
 		@model.destroy()
 		@view.remove()
 
+	showButtons: (e) ->
+		@select('focus').show()
+		@select('remove').show()
+
+	hideButtons: (e) ->
+		@select('focus').hide()
+		@select('remove').hide()
+
 	buildValue: ->
 		$('<input type="text">').addClass('value').val(@model.get('value'))
 
 	buildFocusButton: ->
-		$('<a href="#">v</a>').addClass('focusme button')
+		$('<a href="#">v</a>').addClass('focusme button').hide()
 
 	buildRemoveButton: ->
 		if @model.get('root_node')
 			''
 		else
-			$('<a href="#">x</a>').addClass('removeme button')
+			$('<a href="#">x</a>').addClass('removeme button').hide()
 
 	buildChildContainer: -> ''
 
@@ -72,7 +80,7 @@ class NodeStateOpen extends NodeStateBase
 		return $(@el)
 
 	buildFocusButton: ->
-		$('<a href="#">v</a>').addClass('focusme flip_text button')
+		$('<a href="#">v</a>').addClass('focusme flip_text button').hide()
 
 	buildEmptyNode: ->
 		emptyNode = new NodeView(
@@ -176,6 +184,8 @@ class NodeView extends Backbone.View
 		events["change " + viewId + " .value"] = 'update'
 		events["click " + viewId + " .focusme"] = 'focus'
 		events["click " + viewId + " .removeme"] = 'delete'
+		events["mouseover " + viewId] = 'showButtons'
+		events["mouseout " + viewId] = 'hideButtons'
 		return events
 
 	update: (e) ->
@@ -200,6 +210,12 @@ class NodeView extends Backbone.View
 	delete: (e) ->
 		console.log("remove[#{@model.get('value')}]")
 		@state.delete(e)
+
+	showButtons: (e) ->
+		@state.showButtons(e)
+
+	hideButtons: (e) ->
+		@state.hideButtons(e)
 
 
 class NodeController

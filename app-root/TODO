@@ -1,7 +1,5 @@
 
-
-- First time here cookie.
-- user logged in decorator
+- mouseover control popup
 - validate and sanitize user input
 - children of removed nodes are still visible
 - add timecreated, etc to model
