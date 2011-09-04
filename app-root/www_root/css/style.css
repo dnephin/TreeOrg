@@ -90,6 +90,18 @@ header H1 {
 	margin-left: -190px;
 }
 
+/* def about link */
+#about_link {
+	position: fixed;
+	left: 0; top: 0;
+	padding: 6px 10px;
+	font-family: 'Bowlby One', sans-serif;
+	font-size: 2em;
+	color: #990000;
+	display: block;
+	text-decoration: none;
+}
+
 #user_bar {
 	text-align: right;
 }
@@ -117,7 +129,7 @@ header H1 {
 	background: #f0f0f0;
 }
 .child_container .default_display:first-child > .disp:first-child {
-	border-top: dotted 1px #333333;
+	border-top: dotted 1px #999;
 }
 
 .default_display > .disp > .value {

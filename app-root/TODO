@@ -1,9 +1,7 @@
 
 == bugs ==
 - fix duplicated elements when parent node value is edited. only happened on 1st child of rootnode
-- put alpha over treeorg using css
-- capture tab keystroke preventDefault and set focus for next value box
-- mouseover control popup
+- keyboard events (ctrl events for del, toggle focus, jump to empty)
 - validate and sanitize user input
 - children of removed nodes are still visible
 - add timecreated, etc to model
@@ -30,4 +28,5 @@
 	- blog
 	- informational store
 	- 
-
+- dates as standard field
+- button to move task to google calendar
