@@ -65,15 +65,16 @@ class Node extends Backbone.Model
 			@set({children: @loadChildren children}, silent: true)
 			
 		for child in @get('children')
-			if not child.isNew()
-				child
+			if child.isNew()
+				continue
+			child
 
 	getEmptyChild: ->
-		last = _.last(@getChildren())
+		last = _.last(@get('children'))
 		if last and last.isNew()
 			return last
 		new_child = new Node pNode: @get('key')
-		@getChildren().push(new_child)
+		@get('children').push(new_child)
 		return new_child
 
 

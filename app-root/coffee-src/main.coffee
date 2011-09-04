@@ -32,6 +32,7 @@ class NodeStateBase
 		$('<a href="#">v</a>').addClass('focusme')
 
 	buildChildContainer: -> ''
+
 	select: (ele) ->
 		switch ele
 			when 'value' then @view.$(' > .disp > .value')
@@ -52,6 +53,12 @@ class NodeStateOpen extends NodeStateBase
 		@view.changeState NodeState.closed
 		@view.render()
 
+	render: (e) ->
+		super e
+		@buildChildren()
+		@buildEmptyNode()
+		return $(@el)
+
 	buildFocusButton: ->
 		$('<a href="#">^</a>').addClass('focusme')
 
@@ -62,12 +69,6 @@ class NodeStateOpen extends NodeStateBase
 		)
 		@addChildToDom(emptyNode.render())
 		emptyNode.state.select('value').focus()
-
-	render: (e) ->
-		super e
-		@buildChildren()
-		@buildEmptyNode()
-		return $(@el)
 
 	buildChildren: ->
 		for childNode in @model.getChildren()
@@ -92,7 +93,6 @@ class NodeStateClosed extends NodeStateBase
 		@view.changeState NodeState.open
 		@view.state.render()
 
-	buildChildContainer: -> ''
 
 class NodeStateEmpty extends NodeStateBase
 	###
