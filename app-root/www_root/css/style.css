@@ -93,7 +93,7 @@ header H1 {
 	padding; 3px;
 	margin: 2px;
 	border: solid 1px #bbb;
-	width: 300px;
+	width: 308px;
 }
 
 .default_display > .disp > .value {
@@ -104,35 +104,49 @@ header H1 {
 	width: 250px;
 }
 
+/* def Button */
 .default_display > .disp > .button {
 	text-decoration: none;
-	padding: 0 2px;
-	margin: 2px;
 	font-family: 'Comfortaa', monospace;
 	vertical-align: top;
 	font-weight: 700;
-    text-shadow: 0 0 6px black;
+	display: inline-block;
+	border: 1px dotted #333;
+	padding: 0px 5px 3px;
+	margin: 1px 1px 1px 0;
+	float: right;
 }
-
 .default_display > .disp > .button:hover {
-	color: #333;
-	display: block;
 }
 
 .default_display > .disp > .focusme {
 	color: #254D5D;
-	margin-left: 12px;
+    text-shadow: 0 0 6px #254D5D;
+}
+.default_display > .disp > .focusme:hover {
+    text-shadow: 0px 0px 2px #254D5D;
 }
 .default_display > .disp > .removeme {
-	color: #f00;
+	color: #900020;
+    text-shadow: 0px 0px 6px #900020;
+}
+.default_display > .disp > .removeme:hover {
+    text-shadow: 0px 0px 2px #900020;
 }
 
 .child_container {
 	margin-left: 30px;
 }
 
+.default_display > .disp > .focusme.flip_text {
+    text-shadow: 0 0 6px #1F5000;
+	color: #1F5000;
+}
+.default_display > .disp > .focusme.flip_text:hover {
+    text-shadow: 0px 0px 2px #1F5000;
+}
+
 .flip_text {
-	display:inline-block;
 	-webkit-transform: rotate(180deg); 
 	-moz-transform: rotate(180deg);	
 }
