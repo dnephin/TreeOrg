@@ -1,0 +1,5 @@
+
+
+- user logged in decorator
+- validate and sanitize user input
+- children of removed nodes are still visible

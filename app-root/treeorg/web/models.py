@@ -25,6 +25,7 @@ class Node(db.Expando):
 	value = db.StringProperty()
 	children = TransientProperty()
 	pNode = db.SelfReferenceProperty()
+	active = db.BooleanProperty(default=True)
 	# time created
 	# time updated
 	
@@ -41,6 +42,7 @@ class Node(db.Expando):
 	@classmethod
 	def get_with_children(cls, key):
 		node = cls.get(key)
+		assert node.active
 		node.children = cls.get_children(node.key())
 		for child in node.children:
 			assert child.user == node.user
@@ -73,6 +75,7 @@ class Node(db.Expando):
 		if not keys:
 			return []
 		query = cls.all()
+		query.filter('active =', True)
 		query.filter('pNode IN', keys)
 		return list(query)
 

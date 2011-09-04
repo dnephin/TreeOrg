@@ -65,7 +65,8 @@ td { vertical-align: top; }
 /* ==|== primary styles =====================================================
    Author: 
    ========================================================================== */
- #container {
+header,
+#container {
  	margin: 0 auto;
 	width: 600px;
 }
@@ -73,7 +74,7 @@ td { vertical-align: top; }
 .default_display > .disp {
 	padding; 3px;
 	margin: 2px;
-	border: solid 1px #e9e9e9;
+	border: solid 1px #999;
 	width: 300px;
 }
 
@@ -85,8 +86,41 @@ td { vertical-align: top; }
 	width: 250px;
 }
 
+.default_display > .disp > .button {
+	text-decoration: none;
+	padding: 0 2px;
+	margin: 2px;
+	font-family: 'Comfortaa', monospace;
+	vertical-align: top;
+	font-weight: 700;
+}
+
+.default_display > .disp > .button:hover {
+	background: #aaa;
+	color: #333;
+}
+
+
+.default_display > .disp > .focusme {
+	color: #aaa;
+	background: #fff;
+	margin-left: 12px;
+}
+.default_display > .disp > .removeme {
+	color: #a00;
+	background: #fff;
+}
+
+
+
 .child_container {
 	margin-left: 30px;
+}
+
+.flip_text {
+	display:inline-block;
+	-webkit-transform: rotate(180deg); 
+	-moz-transform: rotate(180deg);	
 }
 
 /* ==|== non-semantic helper classes ======================================== */

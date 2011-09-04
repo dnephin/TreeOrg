@@ -103,6 +103,16 @@ class NodeServlet(Servlet):
 		new_node.put()
 		return json.enc(new_node)
 
+	# TODO: logged in decorator
+	def DELETE(self, key):
+		user = users.get_current_user()
+		node = models.Node.get(key)
+		assert node.user == user
+		assert not node.root_node
+		node.active = False
+		node.put()
+		
+
 class NodeChildrenServlet(Servlet):
 	url_base = 'children'
 	action = '([^/]*)'

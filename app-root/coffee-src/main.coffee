@@ -13,6 +13,7 @@ class NodeStateBase
 		div = $(@view.make('div', class: 'disp', id: @view.cid))
 		div.append(@buildValue())
 		div.append(@buildFocusButton())
+		div.append(@buildRemoveButton())
 		$(@el).html(div)
 		$(@el).append(cc)
 		return $(@el)
@@ -22,14 +23,24 @@ class NodeStateBase
 		@model.save()
 
 	focus: (e) ->
-		if e
-			e.preventDefault()
+		e.preventDefault() if e
+
+	delete: (e) ->
+		e.preventDefault() if e
+		@model.destroy()
+		@view.remove()
 
 	buildValue: ->
 		$('<input type="text">').addClass('value').val(@model.get('value'))
 
 	buildFocusButton: ->
-		$('<a href="#">v</a>').addClass('focusme')
+		$('<a href="#">v</a>').addClass('focusme button')
+
+	buildRemoveButton: ->
+		if @model.get('root_node')
+			''
+		else
+			$('<a href="#">x</a>').addClass('removeme button')
 
 	buildChildContainer: -> ''
 
@@ -37,6 +48,7 @@ class NodeStateBase
 		switch ele
 			when 'value' then @view.$(' > .disp > .value')
 			when 'focus' then @view.$(' > .disp > .focusme')
+			when 'remove' then @view.$(' > .disp > .removeme')
 			when 'child_container' then @view.$(' > .child_container')
 
 
@@ -60,7 +72,7 @@ class NodeStateOpen extends NodeStateBase
 		return $(@el)
 
 	buildFocusButton: ->
-		$('<a href="#">^</a>').addClass('focusme')
+		$('<a href="#">v</a>').addClass('focusme flip_text button')
 
 	buildEmptyNode: ->
 		emptyNode = new NodeView(
@@ -110,8 +122,11 @@ class NodeStateEmpty extends NodeStateBase
 		# This is messy... and broken
 		@parentView.state.buildEmptyNode()
 
-	# Empty node does not have a focus button
+	delete: (e) ->
+
+	# Empty node does not have a focus or remove  button
 	buildFocusButton: ->
+	buildRemoveButton: ->
 
 	buildValue: ->
 		$('<input type="text">').addClass('value')
@@ -160,6 +175,7 @@ class NodeView extends Backbone.View
 		events = {}
 		events["change " + viewId + " .value"] = 'update'
 		events["click " + viewId + " .focusme"] = 'focus'
+		events["click " + viewId + " .removeme"] = 'delete'
 		return events
 
 	update: (e) ->
@@ -180,6 +196,10 @@ class NodeView extends Backbone.View
 	focus: (e) ->
 		console.log("focus[#{@model.get('value')}]")
 		@state.focus(e)
+
+	delete: (e) ->
+		console.log("remove[#{@model.get('value')}]")
+		@state.delete(e)
 
 
 class NodeController
