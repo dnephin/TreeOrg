@@ -27,11 +27,18 @@ class Servlet(object):
 	action = None
 	extra = []
 
-
 	@classmethod
 	def url(cls):
 		parts = [p for p in [cls.url_base, cls.action] + cls.extra if p]
 		return '/%s' % ('/'.join(parts))
+
+	def context(self):
+		return storage(
+			user=users.get_current_user()
+		)
+
+	def loginurl(self):
+		return users.create_login_url('/tree')
 		
 
 class Main(Servlet):
@@ -41,26 +48,32 @@ class Main(Servlet):
 	def GET(self):
 		user = users.get_current_user()
 		if user:
-			return render.index(storage(user=user))
-		raise web.seeother(users.create_login_url(ctx.path))
+			return web.seeother('/tree')
+		raise web.seeother(self.loginurl())
+
+class About(Servlet):
+	"""About the site page."""
+	url_base = 'about'
+
+	def GET(self):
+		context = self.context()
+		context.loginurl = self.loginurl()
+		debug(context)
+		return render.about(context)
 
 class Tree(Servlet):
 	"""Full page which loads javascript app."""
 	url_base = 'tree'
 
-	# TODO: logged in decorator
 	def GET(self):
-		user = users.get_current_user()
-		return render.tree(storage(user=user))
+		return render.tree(self.context())
 
 class NodeServlet(Servlet):
 	url_base = 'node'
 	action = '([^/]*)'
 
 	# TODO: filter reserved kwargs (key_name, id, parent, etc)
-	# TODO: strip off children
 
-	# TODO: logged in decorator
 	def PUT(self, key):
 		user = users.get_current_user()
 		# TODO: handle errors?
@@ -71,7 +84,6 @@ class NodeServlet(Servlet):
 		new_node.put()
 		return json.enc(new_node)
 
-	# TODO: logged in decorator
 	def GET(self, key):
 		user = users.get_current_user()
 		# TODO: validate input
@@ -80,6 +92,7 @@ class NodeServlet(Servlet):
 		if not key:
 			node = models.Node.get_root_for_user(user, load_depth=depth)
 
+			# TODO: write on GET
 			# First visit
 			if not node:
 				node = models.Node.new_for_user(user, value='root', root_node=True)
@@ -103,7 +116,6 @@ class NodeServlet(Servlet):
 		new_node.put()
 		return json.enc(new_node)
 
-	# TODO: logged in decorator
 	def DELETE(self, key):
 		user = users.get_current_user()
 		node = models.Node.get(key)
@@ -117,7 +129,6 @@ class NodeChildrenServlet(Servlet):
 	url_base = 'children'
 	action = '([^/]*)'
 
-	# TODO: logged in decorator
 	def GET(self, key):
 		user = users.get_current_user()
 		children = models.Node.get_children([db.Key(key)])

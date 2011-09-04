@@ -7,8 +7,12 @@ handlers:
 - url: /
   script: main.py
 
+- url: /about
+  script: main.py
+
 - url: /(node|tree|children).*
   script: main.py
+  login: required
 
 - url: /
   static_dir: www_root/

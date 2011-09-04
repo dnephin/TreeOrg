@@ -1,5 +1,14 @@
 
 
+- First time here cookie.
 - user logged in decorator
 - validate and sanitize user input
 - children of removed nodes are still visible
+- add timecreated, etc to model
+- tests
+
+
+Features
+- configuration display
+- links
+- type to find node (ex: sports/hockey/game1/)

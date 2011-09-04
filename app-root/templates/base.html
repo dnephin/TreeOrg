@@ -24,6 +24,12 @@ $def with (content)
 
 <body>
 	<header>
+	<div id="user_bar">
+	$if content.user:
+		$content.user
+	else:
+		<a href="$content.loginurl">Sign-up or login</a>
+	</div>
 	<h1>treeorg</h1>
 	</header>
 	$:content
@@ -51,7 +57,6 @@ $def with (content)
 
   <!-- scripts concatenated and minified via ant build script-->
   <script defer src="js/plugins.js"></script>
-  <script defer src="js/main.js"></script>
   <!-- end scripts-->
 
 	

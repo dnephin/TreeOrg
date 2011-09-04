@@ -2,6 +2,31 @@ from web.template import CompiledTemplate, ForLoop, TemplateResult
 
 
 # coding: utf-8
+def about (context):
+    __lineoffset__ = -4
+    loop = ForLoop()
+    self = TemplateResult(); extend_ = self.extend
+    extend_([u'\n'])
+    self['title'] = join_(u'Explore the Tree')
+    self['user'] = join_(u'context.user')
+    self['loginurl'] = join_(u'context.loginurl')
+    extend_([u'\n'])
+    extend_([u'<div id="container">\n'])
+    extend_([u'\n'])
+    extend_([u"        <p>What's this all about?</p>\n"])
+    if context.user:
+        extend_(['        ', u'    <a href="/">Try it out</a>\n'])
+    else:
+        extend_(['        ', u'    <a href="', escape_(context.loginrul, True), u'">Sign-in to try it out</a>\n'])
+        extend_(['        ', u'\n'])
+    extend_([u'</div>\n'])
+
+    return self
+
+about = CompiledTemplate(about, 'templates/about.html')
+join_ = about._join; escape_ = about._escape
+
+# coding: utf-8
 def base (content):
     __lineoffset__ = -4
     loop = ForLoop()
@@ -21,16 +46,22 @@ def base (content):
     extend_([u'  <meta name="author" content="">\n'])
     extend_([u'\n'])
     extend_([u'  <meta name="viewport" content="width=device-width,initial-scale=1">\n'])
-    extend_([u'  <script src="js/libs/modernizr-2.0.6.min.js"></script>\n'])
     extend_([u'\n'])
     extend_([u"  <link href='http://fonts.googleapis.com/css?family=Open+Sans|Comfortaa' rel='stylesheet' type='text/css'>\n"])
     extend_([u'  <link rel="stylesheet" href="css/style.css">\n'])
     extend_([u'\n'])
     extend_([u'  <link rel="shortcut icon" href="/favicon.gif" />\n'])
+    extend_([u'  <script src="js/libs/modernizr-2.0.6.min.js"></script>\n'])
     extend_([u'</head>\n'])
     extend_([u'\n'])
     extend_([u'<body>\n'])
     extend_([u'        <header>\n'])
+    extend_([u'        <div id="user_bar">\n'])
+    if content.user:
+        extend_(['        ', u'    ', escape_(content.user, True), u'\n'])
+    extend_([u'        else:\n'])
+    extend_([u'                <a href="', escape_(content.loginurl, True), u'">Sign-up or login</a>\n'])
+    extend_([u'        </div>\n'])
     extend_([u'        <h1>treeorg</h1>\n'])
     extend_([u'        </header>\n'])
     extend_([u'        ', escape_(content, False), u'\n'])
@@ -58,7 +89,6 @@ def base (content):
     extend_([u'\n'])
     extend_([u'  <!-- scripts concatenated and minified via ant build script-->\n'])
     extend_([u'  <script defer src="js/plugins.js"></script>\n'])
-    extend_([u'  <script defer src="js/main.js"></script>\n'])
     extend_([u'  <!-- end scripts-->\n'])
     extend_([u'\n'])
     extend_([u'        \n'])
@@ -115,9 +145,6 @@ def index (context):
     extend_([u'\n'])
     self['title'] = join_(u'Explore the Tree')
     extend_([u'\n'])
-    extend_([u'<div id="container">\n'])
-    extend_([u'\n'])
-    extend_([u'</div>\n'])
 
     return self
 
@@ -132,9 +159,12 @@ def tree (context):
     extend_([u'\n'])
     self['title'] = join_(u'Explore the Tree')
     extend_([u'\n'])
-    extend_([u'<div>You are ', escape_(context.user, True), u'</div>\n'])
-    extend_([u'<a href="/">a</a>\n'])
+    extend_([u'<div id="container">\n'])
     extend_([u'\n'])
+    extend_([u'</div>\n'])
+    extend_([u'\n'])
+    extend_([u'\n'])
+    extend_([u'<script defer src="js/main.js"></script>\n'])
 
     return self
 

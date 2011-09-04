@@ -37,10 +37,12 @@ class Node(db.Expando):
 
 	@classmethod
 	def new_for_user(cls, user, **kwargs):
+		"""Create a new node for the user."""
 		return cls(user=user, **kwargs)
 
 	@classmethod
 	def get_with_children(cls, key):
+		"""Get a node with its immediate children."""
 		node = cls.get(key)
 		assert node.active
 		node.children = cls.get_children(node.key())
@@ -50,6 +52,7 @@ class Node(db.Expando):
 
 	@classmethod
 	def get_root_for_user(cls, user, load_depth=1):
+		"""Get the root node for a user, with children to load_depth."""
 		query = cls.all()
 		query.filter('user =', user)
 		query.filter('root_node =', True)
@@ -72,6 +75,7 @@ class Node(db.Expando):
 
 	@classmethod
 	def get_children(cls, keys):
+		"""Get the children for a list of parent keys."""
 		if not keys:
 			return []
 		query = cls.all()
