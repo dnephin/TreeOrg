@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="container">
+
+	<p>What's this all about?</p>
+	{% if user is defined %}
+		<a href="/">Try it out</a>
+	{% else %}
+		<a href="{{ loginurl }}">Sign-in to try it out</a>
+	{% endif %}
+
+</div>
+{% endblock %}

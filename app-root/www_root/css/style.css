@@ -11,12 +11,12 @@ html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-
 body { margin: 0; font-size: 13px; line-height: 1.231; }
 body, button, input, select, textarea { font-family: 'Open Sans', sans-serif; color: #222; }
 
-::-moz-selection { background: #fe57a1; color: #fff; text-shadow: none; }
-::selection { background: #fe57a1; color: #fff; text-shadow: none; }
+::-moz-selection { background: #0c0; color: #000; text-shadow: none; }
+::selection { background: #0c0; color: #000; text-shadow: none; }
 
-a { color: #00e; }
-a:visited { color: #551a8b; }
-a:hover { color: #06e; }
+a { color: #254D5D; }
+a:visited { color: #254D5D; }
+a:hover { color: #6B99AF; }
 a:focus { outline: thin dotted; }
 a:hover, a:active { outline: 0; }
 
@@ -71,10 +71,28 @@ header,
 	width: 600px;
 }
 
+#user_bar {
+	text-align: right;
+}
+#user_bar A {
+	font-size: 0.9em;
+	font-weight: bold;
+	text-decoration: none;
+	color: #254D5D;
+}
+#user_bar A:hover {
+	text-decoration: underline;
+	color: #6B99AF
+}
+
+header H1 {
+	margin-top: 2px;
+}
+
 .default_display > .disp {
 	padding; 3px;
 	margin: 2px;
-	border: solid 1px #999;
+	border: solid 1px #bbb;
 	width: 300px;
 }
 
@@ -93,25 +111,20 @@ header,
 	font-family: 'Comfortaa', monospace;
 	vertical-align: top;
 	font-weight: 700;
+    text-shadow: 0 0 6px black;
 }
 
 .default_display > .disp > .button:hover {
-	background: #aaa;
 	color: #333;
 }
 
-
 .default_display > .disp > .focusme {
-	color: #aaa;
-	background: #fff;
+	color: #254D5D;
 	margin-left: 12px;
 }
 .default_display > .disp > .removeme {
-	color: #a00;
-	background: #fff;
+	color: #f00;
 }
-
-
 
 .child_container {
 	margin-left: 30px;

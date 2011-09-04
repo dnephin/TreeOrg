@@ -1,6 +1,7 @@
 import web
 from web.utils import storage
 from web.webapi import debug, ctx
+from web.contrib.template import render_jinja
 
 from google.appengine.api import users
 from google.appengine.ext import db
@@ -9,7 +10,7 @@ from treeorg.web import json
 from treeorg.web import models 
 from treeorg.web import url
 
-render = web.template.render('templates/', base='base')
+render = render_jinja('templates', encoding='utf-8')
 
 
 class ServletType(type):
@@ -34,7 +35,9 @@ class Servlet(object):
 
 	def context(self):
 		return storage(
-			user=users.get_current_user()
+			user=users.get_current_user(),
+			loginurl=self.loginurl(),
+			logouturl=users.create_logout_url('/')
 		)
 
 	def loginurl(self):
@@ -49,7 +52,7 @@ class Main(Servlet):
 		user = users.get_current_user()
 		if user:
 			return web.seeother('/tree')
-		raise web.seeother(self.loginurl())
+		raise web.seeother('/about')
 
 class About(Servlet):
 	"""About the site page."""
@@ -59,7 +62,7 @@ class About(Servlet):
 		context = self.context()
 		context.loginurl = self.loginurl()
 		debug(context)
-		return render.about(context)
+		return render.about(**context)
 
 class Tree(Servlet):
 	"""Full page which loads javascript app."""
