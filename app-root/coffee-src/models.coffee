@@ -8,13 +8,15 @@ class Node extends Backbone.Model
 
 	initialize: (data) ->
 		@childrenLoaded = false
+		@childCollection = new NodeCollection
 		if data.key
 			@id = data.key.key
 
 	parse: (resp, xhr) ->
 		@id = resp.key.key
 		if resp.children
-			resp.children = @loadChildren resp.children
+			@loadChildren resp.children
+			resp.children = null
 				
 		return resp
 
@@ -35,13 +37,11 @@ class Node extends Backbone.Model
 
 	loadChildren: (children) ->
 		@childrenLoaded = true
-		for child in children
-			node = new Node child
+		@childCollection.add(children)
+		@childCollection.each (node) ->
 			cchildren = node.get('children')
 			if cchildren
-				cnodes = node.loadChildren(cchildren)
-				node.set({'children': cnodes}, silent: true)
-			node
+				node.loadChildren(cchildren)
 	
 	fetchChildren: ->
 		children = null
@@ -58,23 +58,30 @@ class Node extends Backbone.Model
 
 	getChildren: ->
 		###
-		 Return all existing children (not empty) and load them if neessary.
+		 Return all existing children (not empty) and load them if necessary.
 		###
 		if not @childrenLoaded
 			children = @fetchChildren()
-			@set({children: @loadChildren children}, silent: true)
-			
-		for child in @get('children')
-			if child.isNew()
-				continue
-			child
+			@loadChildren(children)
+
+		@childCollection.filter( (n) -> not n.isNew() )
 
 	getEmptyChild: ->
-		last = _.last(@get('children'))
-		if last and last.isNew()
-			return last
+		empty = @childCollection.find( (n) -> n.isNew() )
+		if empty
+			return empty
+
 		new_child = new Node pNode: @get('key')
-		@get('children').push(new_child)
+		@childCollection.add(new_child)
 		return new_child
 
+	destroy: (options) ->
+		super options
+		# TODO: this should be handled by success callback, but it is not firing
+		@collection.remove(this)
+
+
+class NodeCollection extends Backbone.Collection
+
+	model: Node
 
