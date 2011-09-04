@@ -20,11 +20,6 @@ class Node extends Backbone.Model
 				
 		return resp
 
-	save: (attrs, options) ->
-		# Set id to pending if this is a new object
-		# TODO: This may be super broken
-		super attrs, options
-
 	url: ->
 		base = @urlRoot
 		return base if @isNew()

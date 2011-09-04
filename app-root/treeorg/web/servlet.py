@@ -1,3 +1,4 @@
+import logging
 import web
 from web.utils import storage
 from web.webapi import debug, ctx
@@ -73,7 +74,6 @@ class NodeServlet(Servlet):
 	url_base = 'node'
 	action = '([^/]*)'
 
-	# TODO: filter reserved kwargs (key_name, id, parent, etc)
 
 	def PUT(self, key):
 		"""PUT called to save an existing node."""
@@ -101,7 +101,9 @@ class NodeServlet(Servlet):
 			# TODO: write on GET
 			# First visit
 			if not node:
-				node = models.Node.new_for_user(user, value='root', root_node=True)
+				node = models.Node.new_for_user(user, 
+					{'value':'root', 'root_node': True}
+				)
 				node.put()
 		else:
 			node = models.Node.get_with_children(key)
@@ -118,11 +120,8 @@ class NodeServlet(Servlet):
 		node_data = json.dec(web.data())
 		assert not node_data.get('key')
 
-		# TODO: replace with validation
-		node_data = dict(('%s' % k, v ) for k, v in node_data.iteritems())
-
-		# TODO: no unicode support
-		new_node = models.Node.new_for_user(user, **node_data)
+		logging.info("New Node: %r" % node_data)
+		new_node = models.Node.new_for_user(user, node_data)
 		new_node.put()
 		return json.enc(new_node)
 

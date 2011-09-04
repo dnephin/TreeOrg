@@ -8,14 +8,14 @@ except:
 	pass
 
 try:
-	import simplejson as sjson
+	import simplejson as _json
 except:
-	import json as sjson
+	import json as _json
 
 from treeorg.web import models
 
 
-class GaeJsonEncoder(sjson.JSONEncoder):
+class GaeJsonEncoder(_json.JSONEncoder):
 
 	def __init__(self, filter=None, **kwargs):
 		self.filter = set(filter or [])
@@ -90,8 +90,10 @@ def decode_object_hook(obj):
 		cls = getattr(models, model_type)
 		del obj['__type']
 		del obj['__model_type']
-		obj_inst = cls(**obj)
-		return obj_inst
+		# Fix for unicode kwargs
+		if hasattr(cls, 'from_dict'):
+			return cls.from_dict(obj)
+		return cls(**obj)
 
 	if obj_type == 'datetime.datetime':
 		dt = datetime.datettime.fromtimestamp(tuple(obj['epoch']))
@@ -108,8 +110,8 @@ def decode_object_hook(obj):
 
 __gae__encoder_filtered = GaeJsonEncoder(filter=[users.User])
 __gae__encoder_raw = GaeJsonEncoder()
-__gae__decoder = sjson.JSONDecoder(object_hook=decode_object_hook)
-__gae__decoder_raw = sjson.JSONDecoder()
+__gae__decoder = _json.JSONDecoder(object_hook=decode_object_hook)
+__gae__decoder_raw = _json.JSONDecoder()
 
 
 def enc(obj, filter_user=True):

@@ -16,8 +16,31 @@ class TransientProperty(db.Property):
 	def make_value_from_datastore(self, value):
 		return None 
 
+class ModelHelperMixin(object):
+	"""Methods to supplement db.Expando or db.Model."""
 
-class Node(db.Expando):
+	@classmethod
+	def from_dict(cls, data):
+		"""This is used to create a new instance of the model model.
+		normally just kwargs could be used, but python (2.5) does not
+		support unicode as the kwarg param.
+		"""
+		# TODO: filter reserved kwargs (key_name, id, parent, etc)
+		key = data.pop('key', None)
+		obj = cls(key=key)
+		for k, v in data.iteritems():
+			if k == 'key':
+				obj.key
+			setattr(obj, k, v)
+		return obj
+
+#	@classmethod
+#	def key(cls, name=None):
+#		return db.Key.from_path(cls.__name__, name or 'Unknown')
+
+
+
+class Node(db.Expando, ModelHelperMixin):
 	"""A node in the organization tree."""
 
 	user = db.UserProperty(auto_current_user=True)
@@ -28,17 +51,15 @@ class Node(db.Expando):
 	active = db.BooleanProperty(default=True)
 	# time created
 	# time updated
-	
+
 	#display = db.ReferenceProperty()
 
-#	@classmethod
-#	def key(cls, name=None):
-#		return db.Key.from_path(cls.__name__, name or 'Unknown')
-
 	@classmethod
-	def new_for_user(cls, user, **kwargs):
+	def new_for_user(cls, user, data):
 		"""Create a new node for the user."""
-		return cls(user=user, **kwargs)
+		data['user'] = user
+		obj = cls.from_dict(data)
+		return obj
 
 	@classmethod
 	def get_with_children(cls, key):

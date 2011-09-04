@@ -1,6 +1,5 @@
 
 == bugs ==
-- 2 live bugs (pending id, and crash on post)
 - change to editable div instead of inputs for better copy/paste
 
 
@@ -13,9 +12,15 @@
 - loading notification (spinning something near title?)
 - error notification
 - look at less
+- Can I change Node.children to Node._children and remove transient property, or will that lose children in encode/decode ?
 
 
-== before telease ==
+== before release ==
+- assign root_node to a name, and create a permission object for that root.
+	all children of that root share that permission
+- use google app engine logging
+- restrict reserved model properties
+
 
 == features ==
 - configuration display
