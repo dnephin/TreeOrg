@@ -60,8 +60,6 @@ class About(Servlet):
 
 	def GET(self):
 		context = self.context()
-		context.loginurl = self.loginurl()
-		debug(context)
 		return render.about(**context)
 
 class Tree(Servlet):
@@ -78,6 +76,7 @@ class NodeServlet(Servlet):
 	# TODO: filter reserved kwargs (key_name, id, parent, etc)
 
 	def PUT(self, key):
+		"""PUT called to save an existing node."""
 		user = users.get_current_user()
 		# TODO: handle errors?
 		new_node = json.dec(web.data())
@@ -85,6 +84,10 @@ class NodeServlet(Servlet):
 		old_node = models.Node.get(new_node.key())
 		assert old_node.user == user
 		new_node.put()
+		# Remove reference to children since these should be transient
+		# and sending them back after a save request confuses the 
+		# client and causes duplicate child nodes.
+		new_node.children = None 
 		return json.enc(new_node)
 
 	def GET(self, key):
@@ -108,13 +111,17 @@ class NodeServlet(Servlet):
 		return json.enc(node)
 
 	def POST(self, key):
+		"""POST called to create a new node."""
 		assert not key
 		user = users.get_current_user()
 		# TODO: handle errors?
 		node_data = json.dec(web.data())
-		debug(node_data)
 		assert not node_data.get('key')
 
+		# TODO: replace with validation
+		node_data = dict(('%s' % k, v ) for k, v in node_data.iteritems())
+
+		# TODO: no unicode support
 		new_node = models.Node.new_for_user(user, **node_data)
 		new_node.put()
 		return json.enc(new_node)

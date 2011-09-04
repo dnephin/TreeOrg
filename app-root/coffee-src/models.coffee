@@ -24,8 +24,6 @@ class Node extends Backbone.Model
 		# Set id to pending if this is a new object
 		# TODO: This may be super broken
 		super attrs, options
-		if @isNew()
-			@id = 'pending'
 
 	url: ->
 		base = @urlRoot

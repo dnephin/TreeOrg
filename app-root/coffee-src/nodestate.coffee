@@ -12,19 +12,6 @@ class NodeStateBase
 		@model = @view.model
 		@el = @view.el
 
-#	render: =>
-#		@preRender()
-#		@_render()
-#		@postRender()
-
-	preRender: ->
-		
-		
-	postRender: ->
-		if @_is_first_render
-			@is_first_render = false
-		#	@initCss()
-
 	render: ->
 		cc = @buildChildContainer()
 		div = $(@view.make('div', class: 'disp', id: @view.cid))
@@ -36,7 +23,8 @@ class NodeStateBase
 		$(@el).append(cc)
 		return $(@el)
 	update: ->
-		@model.set 'value': @select('value').val()
+		 #TODO: does this ever need to re-render ?
+		@model.set {'value': @select('value').val()},{silent: true}
 		@model.save()
 
 	focus: (e) ->
@@ -46,16 +34,6 @@ class NodeStateBase
 		e.preventDefault() if e
 		@model.destroy()
 		@view.remove()
-
-#	_show: (el) ->
-#		el.css('display', 'block-inline')
-
-	initCss: (selector) ->
-		cssDef =
-			'focus': [[display, 'none']]
-
-		for op in cssDef[selector] or []
-			@select(selector).css(op[0], op[1])
 
 	showButtons: (e) ->
 		@select('focus').show()

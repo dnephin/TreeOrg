@@ -3,11 +3,11 @@
 {% block content %}
 <div id="container">
 
-	<p>What's this all about?</p>
-	{% if user is defined %}
+	<p>What is this all about?</p>
+	{% if user %}
 		<a href="/">Try it out</a>
 	{% else %}
-		<a href="{{ loginurl }}">Sign-in to try it out</a>
+		<a href="{{ loginurl }}">Login to try it out</a>
 	{% endif %}
 
 </div>

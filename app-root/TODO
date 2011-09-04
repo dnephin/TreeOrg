@@ -1,12 +1,17 @@
 
 == bugs ==
-- fix duplicated elements when parent node value is edited. only happened on 1st child of rootnode
+- 2 live bugs (pending id, and crash on post)
+- change to editable div instead of inputs for better copy/paste
+
+
+- animation/effect on open/close parents (maybe highlight or dropdown)
 - keyboard events (ctrl events for del, toggle focus, jump to empty)
 - validate and sanitize user input
 - children of removed nodes are still visible
 - add timecreated, etc to model
 - tests
 - loading notification (spinning something near title?)
+- error notification
 - look at less
 
 
@@ -30,3 +35,4 @@
 	- 
 - dates as standard field
 - button to move task to google calendar
+- move items up and down in the list
