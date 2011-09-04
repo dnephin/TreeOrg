@@ -1,12 +1,33 @@
 
+== bugs ==
+- fix duplicated elements when parent node value is edited. only happened on 1st child of rootnode
+- put alpha over treeorg using css
+- capture tab keystroke preventDefault and set focus for next value box
 - mouseover control popup
 - validate and sanitize user input
 - children of removed nodes are still visible
 - add timecreated, etc to model
 - tests
+- loading notification (spinning something near title?)
+- look at less
 
 
-Features
+== before telease ==
+
+== features ==
 - configuration display
 - links
 - type to find node (ex: sports/hockey/game1/)
+- backbone extension
+- show long text when focused somewhere?
+- markdown
+- links
+- menu for meta properties (scalar, list, map)
+- embed (size controls)
+- cavas view of the tree (cache some node structure?)
+- uses:
+	- wiki
+	- blog
+	- informational store
+	- 
+

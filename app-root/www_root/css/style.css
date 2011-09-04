@@ -71,85 +71,118 @@ header,
 	width: 600px;
 }
 
+header H1 {
+	font-size: 3em;
+	margin-top: 0px;
+	color: black;
+	font-weight: bold;
+}
+
+/* def alpha banner */
+#alpha_ban {
+	font-family: 'Open Sans'. sans-serif;
+	font-weight: bold;
+	font-size: 0.36em;
+	color: #3FBA00;
+	display: inline-block;
+	-moz-transform: rotate(-90deg);
+	-webkit-transform: rotate(-90deg);
+	margin-left: -190px;
+}
+
 #user_bar {
 	text-align: right;
 }
 #user_bar A {
-	font-size: 0.9em;
+	font-size: 1.0em;
 	font-weight: bold;
 	text-decoration: none;
 	color: #254D5D;
 }
 #user_bar A:hover {
 	text-decoration: underline;
-	color: #6B99AF
-}
-
-header H1 {
-	margin-top: 2px;
+	color: #3FBA00
 }
 
 .default_display > .disp {
 	padding; 3px;
 	margin: 2px;
-	border: solid 1px #bbb;
+	border: solid 0 #e5e5e5;
 	width: 308px;
+	border: solid 1px transparent;
+}
+.default_display > .disp.active {
+	border-top-color: #d0d0d0;
+	border-bottom-color: #d0d0d0;
+	background: #f0f0f0;
+}
+.child_container .default_display:first-child > .disp:first-child {
+	border-top: dotted 1px #333333;
 }
 
 .default_display > .disp > .value {
-	padding: 3px;
+	padding: 2px;
 	margin: 2px;
-	font-size: 1.2em;
+	font-size: 1.3em;
 	border: 0px;
-	width: 250px;
+	width: 260px;
+	background: transparent;
+}
+.default_display > .disp > .value:focus {
+    outline: none;
+	color: black;
 }
 
 /* def Button */
 .default_display > .disp > .button {
 	text-decoration: none;
-	font-family: 'Comfortaa', monospace;
-	vertical-align: top;
+	font-family: 'Luckiest Guy', monospace;
+	vertical-align: center;
 	font-weight: 700;
 	display: inline-block;
-	border: 1px dotted #333;
-	padding: 0px 5px 3px;
-	margin: 1px 1px 1px 0;
+	margin: 10px 5px 0 0;
 	float: right;
+	cursor: 'move'
 }
 .default_display > .disp > .button:hover {
 }
 
 .default_display > .disp > .focusme {
 	color: #254D5D;
-    text-shadow: 0 0 6px #254D5D;
 }
 .default_display > .disp > .focusme:hover {
-    text-shadow: 0px 0px 2px #254D5D;
+/*	text-shadow: 3px 0 3px #254D5D;
+ */
 }
+
+.default_display > .disp > .focusme.flip_text {
+	color: #255d30;
+}
+.default_display > .disp > .focusme.flip_text:hover {
+/*	text-shadow: 3px 0 3px #255d30;
+ */
+}
+
 .default_display > .disp > .removeme {
 	color: #900020;
-    text-shadow: 0px 0px 6px #900020;
+	display: none
 }
 .default_display > .disp > .removeme:hover {
-    text-shadow: 0px 0px 2px #900020;
+/*	text-shadow: 0 0 3px #255d30;
+ */
+}
+
+.flip_text {
+/*
+	-webkit-transform: rotate(180deg); 
+	-moz-transform: rotate(180deg);	
+*/
 }
 
 .child_container {
 	margin-left: 30px;
 }
 
-.default_display > .disp > .focusme.flip_text {
-    text-shadow: 0 0 6px #1F5000;
-	color: #1F5000;
-}
-.default_display > .disp > .focusme.flip_text:hover {
-    text-shadow: 0px 0px 2px #1F5000;
-}
-
-.flip_text {
-	-webkit-transform: rotate(180deg); 
-	-moz-transform: rotate(180deg);	
-}
 
 /* ==|== non-semantic helper classes ======================================== */
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; }
