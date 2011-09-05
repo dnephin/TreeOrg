@@ -122,6 +122,7 @@ header H1 {
 	border: solid 0 #e5e5e5;
 	width: 308px;
 	border: solid 1px transparent;
+	background: #f0f0f0;
 }
 .default_display > .disp.active {
 	border-top-color: #d0d0d0;
@@ -129,7 +130,6 @@ header H1 {
 	background: #f0f0f0;
 }
 .child_container .default_display:first-child > .disp:first-child {
-	border-top: dotted 1px #999;
 }
 
 .default_display > .disp > .value {

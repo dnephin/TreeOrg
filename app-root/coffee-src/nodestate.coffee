@@ -15,15 +15,15 @@ class NodeStateBase
 	render: ->
 		cc = @buildChildContainer()
 		div = $(@view.make('div', class: 'disp', id: @view.cid))
-		#	.removeClass(@allStateclasSNames).addClass(@className)
-		div.append(@buildValue())
-		div.append(@buildFocusButton())
-		div.append(@buildRemoveButton())
+			.removeClass(@allStateClassNames).addClass(@className)
+			.append(@buildValue())
+			.append(@buildFocusButton())
+			.append(@buildRemoveButton())
 		$(@el).html(div)
 		$(@el).append(cc)
 		return $(@el)
+
 	update: ->
-		 #TODO: does this ever need to re-render ?
 		@model.set {'value': @select('value').val()},{silent: true}
 		@model.save()
 

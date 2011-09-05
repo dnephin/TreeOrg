@@ -1,3 +1,4 @@
 *.pyc
 .*.swp
 app-root/www_root/js/main.js
+dist
