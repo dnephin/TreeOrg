@@ -1,14 +1,11 @@
 
 == bugs ==
 
-- create a build script for deployments
-	- exclude (*.pyc, tests, dev version of less, backbone.js, other junk)
-	- minify
-	- compile coffee, less
-
 - validate and sanitize user input
 
 - assign a css class to each stage
+
+- fix save pending hack
 
 - keyboard events (ctrl events for del, toggle focus, jump to empty)
 	 -replace current buttons with a single nicer one with a popup
