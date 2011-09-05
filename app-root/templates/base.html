@@ -46,32 +46,15 @@
   <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
   <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
 
-  <!--
-  <script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script> 
-  <script src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>
-  -->
-  <script src="/js/underscore.js"></script>
-  <script src="/js/backbone.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.1.7/underscore-min.js"></script> 
+  <script>window._ || document.write('<script src="/js/libs/underscore-min.js"><\/script>')</script>
 
-
-  <!-- TODO: conditional load
-  <script src="/js/libs/backbone-min.js"></script>
-  <script src="/js/libs/underscore-min.js"></script>
-  -->
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.5.3/backbone-min.js"></script>
+  <script>window.Backbone || document.write('<script src="/js/libs/backbone-min.js"><\/script>')</script>
 
   <script defer src="js/plugins.js"></script>
   {% block endjs %}
   {% endblock %}
-
-	
-  <!-- Change UA-XXXXX-X to be your site's ID -->
-  <script>
-    window._gaq = [['_setAccount','UAXXXXXXXX1'],['_trackPageview'],['_trackPageLoadTime']];
-    Modernizr.load({
-      load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
-    });
-  </script>
-
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
        chromium.org/developers/how-tos/chrome-frame-getting-started -->

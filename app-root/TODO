@@ -1,28 +1,39 @@
 
 == bugs ==
-- change to editable div instead of inputs for better copy/paste
 
+- create a build script for deployments
+	- exclude (*.pyc, tests, dev version of less, backbone.js, other junk)
+	- minify
+	- compile coffee, less
+
+- validate and sanitize user input
+
+- assign a css class to each stage
+
+- keyboard events (ctrl events for del, toggle focus, jump to empty)
+	 -replace current buttons with a single nicer one with a popup
+
+- loading notification (spinning something near title?) + error notification
+
+- use less for css
+
+- Can I change Node.children to Node._children and remove transient property, or will that lose children in encode/decode ?
 
 - animation/effect on open/close parents (maybe highlight or dropdown)
-- keyboard events (ctrl events for del, toggle focus, jump to empty)
-- validate and sanitize user input
-- children of removed nodes are still visible
-- add timecreated, etc to model
-- tests
-- loading notification (spinning something near title?)
-- error notification
-- look at less
-- Can I change Node.children to Node._children and remove transient property, or will that lose children in encode/decode ?
 
 
 == before release ==
-- assign root_node to a name, and create a permission object for that root.
-	all children of that root share that permission
-- use google app engine logging
-- restrict reserved model properties
+Model Refactor:
+	- add timecreated, etc to model
+	- assign root_node to a name, and create a permission object for that root.
+		all children of that root share that permission
+		- right now children of removed nodes are still acessible from their key
+	- restrict reserved model properties
+
 
 
 == features ==
+- numbers on parent nodes to identify count of children (?) for not yet loaded
 - configuration display
 - links
 - type to find node (ex: sports/hockey/game1/)
