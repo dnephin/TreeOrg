@@ -23,9 +23,11 @@ class NodeStateBase
 		$(@el).append(cc)
 		return $(@el)
 
-	update: ->
+	update: (callback) ->
 		@model.set {'value': @select('value').val()},{silent: true}
-		@model.save()
+		options = {}
+		options.success = callback if callback
+		@model.save({}, options)
 
 	focus: (e) ->
 		e.preventDefault() if e
@@ -37,6 +39,7 @@ class NodeStateBase
 
 	showButtons: (e) ->
 		@select('focus').show()
+		# TODO: does with this in keyboard refactor
 #		@select('remove').show()
 		@view.$('> .disp').addClass('active')
 
@@ -122,7 +125,6 @@ class NodeStateClosed extends NodeStateBase
 
 	focus: (e) ->
 		super e
-		# TODO: This needs to be atomic, is it ?
 		@view.changeState NodeState.open
 		@view.state.render()
 
@@ -141,9 +143,9 @@ class NodeStateEmpty extends NodeStateBase
 
 	update: ->
 		@view.changeState NodeState.closed
-		super
-		# This is messy... and broken
-		@parentView.state.buildEmptyNode()
+		# Wait for save to complete to build the new empty
+		super =>
+			@parentView.state.buildEmptyNode()
 
 	delete: (e) ->
 

@@ -72,8 +72,8 @@ class NodeController
 		node = new Node
 		nodeView =  new NodeView model: node, state: NodeState.open
 		$('#container').append(nodeView.el)
-		node.fetch( data: {depth: 4} )
-		window.node = node
+		# TODO: query param to set depth
+		node.fetch( data: {depth: 3} )
 
 
 window.nodeController = new NodeController

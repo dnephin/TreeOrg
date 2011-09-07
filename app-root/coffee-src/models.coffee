@@ -68,13 +68,6 @@ class Node extends Backbone.Model
 		@childCollection.add(new_child)
 		return new_child
 
-	save: (atrs, options) ->
-		# This is a back to prevent new nodes from being overwritten 
-		# because the response has not yet returned from the server.
-		# TODO: Need a beter way to handle this.
-		super atrs, options
-		@id = 'pending' if @isNew
-
 	destroy: (options) ->
 		super options
 		# TODO: this should be handled by success callback, but it is not firing

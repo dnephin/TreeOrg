@@ -21,6 +21,7 @@ class ServletType(type):
 			url.register(cls.url(), cls)
 		super(ServletType, cls).__init__(*args, **kwargs)
 
+
 class Servlet(object):
 	"""Base class for all servlets."""
 	__metaclass__ = ServletType
@@ -74,16 +75,18 @@ class NodeServlet(Servlet):
 	url_base = 'node'
 	action = '([^/]*)'
 
-
 	def PUT(self, key):
 		"""PUT called to save an existing node."""
 		user = users.get_current_user()
+
 		# TODO: handle errors?
 		new_node = json.dec(web.data())
+
 		# Check old node belongs to this user
 		old_node = models.Node.get(new_node.key())
 		assert old_node.user == user
 		new_node.put()
+
 		# Remove reference to children since these should be transient
 		# and sending them back after a save request confuses the 
 		# client and causes duplicate child nodes.
@@ -91,10 +94,13 @@ class NodeServlet(Servlet):
 		return json.enc(new_node)
 
 	def GET(self, key):
+		"""GET called to retrieve a node."""
 		user = users.get_current_user()
-		# TODO: validate input
+
 		input = web.input()
 		depth = int(input.get('depth') or 0)
+
+		# Look for root node
 		if not key:
 			node = models.Node.get_root_for_user(user, load_depth=depth)
 
@@ -114,10 +120,10 @@ class NodeServlet(Servlet):
 
 	def POST(self, key):
 		"""POST called to create a new node."""
-		assert not key
 		user = users.get_current_user()
-		# TODO: handle errors?
+
 		node_data = json.dec(web.data())
+		assert not key
 		assert not node_data.get('key')
 
 		logging.info("New Node: %r" % node_data)
@@ -126,10 +132,13 @@ class NodeServlet(Servlet):
 		return json.enc(new_node)
 
 	def DELETE(self, key):
+		"""DELETE called to remove nodes."""
 		user = users.get_current_user()
 		node = models.Node.get(key)
+
 		assert node.user == user
 		assert not node.root_node
+
 		node.active = False
 		node.put()
 		
@@ -139,7 +148,9 @@ class NodeChildrenServlet(Servlet):
 	action = '([^/]*)'
 
 	def GET(self, key):
+		"""GET called to retrieve children of a node."""
 		user = users.get_current_user()
+
 		children = models.Node.get_children([db.Key(key)])
 		for child in children:
 			assert child.user == user
