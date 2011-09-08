@@ -38,7 +38,7 @@ class Node extends Backbone.Model
 	
 	fetchChildren: ->
 		children = null
-		$.ajax(
+		options =
 			type: 'GET'
 			dataType: 'json'
 			contentType: 'application/json'
@@ -46,7 +46,9 @@ class Node extends Backbone.Model
 			async: false
 			success: (data, textStatus, xhr) ->
 				children = data
-		)
+
+		@_wrapAjax(options)
+		$.ajax(options)
 		return children
 
 	getChildren: ->
@@ -72,6 +74,28 @@ class Node extends Backbone.Model
 		super options
 		# TODO: this should be handled by success callback, but it is not firing
 		@collection.remove(this)
+
+	_wrapAjax: (options) ->
+		window.status_bar.working() if window.status_bar
+
+		# Add success message
+		success = options.success
+		options.success = (data, textStatus, xhr) ->
+			if window.status_bar
+				window.status_bar.done()
+			success(data, textStatus, xhr) if success
+
+		# Add error message
+		error = options.error
+		options.error = (xhr, textStatus, err) ->
+			if window.status_bar
+				window.status_bar.error()
+			error(xhr, textStatus, err) if error
+
+	sync: (method, model, options) ->
+		options or= {}
+		@_wrapAjax(options)
+		Backbone.sync(method, model, options)
 
 
 class NodeCollection extends Backbone.Collection

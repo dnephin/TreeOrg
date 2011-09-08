@@ -195,6 +195,24 @@ header H1 {
 	margin-left: 30px;
 }
 
+#status_bar {
+	position: fixed;
+	top: 0;
+	left: 45%;
+	width: 100px;
+	font-weight: bold;
+	padding: 0.5em 0;
+	margin-top: 2px;
+	text-align: center;
+	font-size: 1.15em;
+	border-width: 2px;
+	border-style: solid;
+}
+
+.working {background:#fff6bf;color:#514721;border-color:#ffd324;}
+.done {background:#e6efc2;color:#264409;border-color:#c6d880;}
+.error {background:#fbe3e4;color:#8a1f11;border-color:#fbc2c4;}
+
 
 /* ==|== non-semantic helper classes ======================================== */
 .ir { display: block; border: 0; text-indent: -999em; overflow: hidden; background-color: transparent; background-repeat: no-repeat; text-align: left; direction: ltr; }

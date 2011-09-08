@@ -44,8 +44,8 @@ class NodeStateBase
 		@view.$('> .disp').addClass('active')
 
 	hideButtons: (e) ->
-		@select('focus').clearQueue().hide()
-		@select('remove').clearQueue().hide()
+		@select('focus').stop(true, true).hide()
+		@select('remove').stop(true, true).hide()
 		@view.$('> .disp').removeClass('active')
 
 	buildValue: ->

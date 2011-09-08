@@ -1,15 +1,17 @@
 
 == bugs ==
 
+- numbers on parent nodes to identify count of children (?) for not yet loaded
 - keyboard events (ctrl events for del, toggle focus, jump to empty)
 	 -replace current buttons with a single nicer one with a popup
 
-- loading notification (spinning something near title?) + error notification
-
 - Can I change Node.children to Node._children and remove transient property, or will that lose children in encode/decode ?
 
+- look at style + less
 
+-- Release
 
+- links
 - animation/effect on open/close parents (maybe highlight or dropdown)
 - use less for css
 - Router for urls
@@ -24,17 +26,15 @@ Model Refactor:
 		- right now children of removed nodes are still acessible from their key
 	- restrict reserved model properties
 
+- local caching between reads/writes (backbone extension)
 
 
 == features ==
-- numbers on parent nodes to identify count of children (?) for not yet loaded
 - configuration display
-- links
 - type to find node (ex: sports/hockey/game1/)
 - backbone extension
 - show long text when focused somewhere?
 - markdown
-- links
 - menu for meta properties (scalar, list, map)
 - embed (size controls)
 - cavas view of the tree (cache some node structure?)

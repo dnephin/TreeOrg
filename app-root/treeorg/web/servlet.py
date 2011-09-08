@@ -98,7 +98,8 @@ class NodeServlet(Servlet):
 		user = users.get_current_user()
 
 		input = web.input()
-		depth = int(input.get('depth') or 0)
+		# limit depth to 5
+		depth = min(int(input.get('depth') or 0), 5)
 
 		# Look for root node
 		if not key:

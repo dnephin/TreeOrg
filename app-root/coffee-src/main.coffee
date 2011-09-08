@@ -66,19 +66,60 @@ class NodeView extends Backbone.View
 		@state.hideButtons(e)
 
 
+class StatusBar extends Backbone.View
+
+	allClasses: 'working done error'
+
+	render: =>
+		$(@el).attr('id', 'status_bar').hide()
+
+	action: (text, addClassName) ->
+		$(@el)
+			.stop(true, true)
+			.html(text)
+			.removeClass(@allClasses)
+			.addClass(addClassName)
+			.show()
+
+	working: ->
+		@action('working...', 'working')
+
+	done: ->
+		@action('done', 'done').delay(800).fadeOut(1000)
+
+	error: ->
+		@action('error!', 'error')
+
+	attach: (parent) ->
+		parent or= $('body')
+		parent.append(@render())
+		return this
+		
+
 class NodeController
 
 	loadRoot: () ->
 		node = new Node
 		nodeView =  new NodeView model: node, state: NodeState.open
 		$('#container').append(nodeView.el)
-		# TODO: query param to set depth
-		node.fetch( data: {depth: 3} )
+		depth = parseUrlSearch().depth or 3
+		node.fetch( data: {depth: depth} )
 
 
-window.nodeController = new NodeController
+parseUrlSearch = ->
+	query = document.location.search.substring(1)
+	params = {}
+	for pair in query.split('&')
+		parts = pair.split('=')
+		params[parts[0]] = parts[1]
+	return params
+
+
 
 $(document).ready( ->
+	window.nodeController = new NodeController
 	# Load the root node
 	nodeController.loadRoot()
+	# Create the status bar
+	window.status_bar = new StatusBar().attach()
 )
