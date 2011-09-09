@@ -100,8 +100,8 @@ class NodeController
 
 	loadRoot: () ->
 		node = new Node
-		nodeView =  new NodeView model: node, state: NodeState.open
-		$('#container').append(nodeView.el)
+		@nodeView =  new NodeView model: node, state: NodeState.open
+		$('#container').append(@nodeView.el)
 		depth = parseUrlSearch().depth or 3
 		node.fetch( data: {depth: depth} )
 
@@ -114,7 +114,19 @@ parseUrlSearch = ->
 		params[parts[0]] = parts[1]
 	return params
 
+setupButtons = ->
+	$('.ui-state-default').hover(
+		-> $(this).addClass('ui-state-hover')
+		-> $(this).removeClass('ui-state-hover').removeClass('ui-state-active')
+	)
+	.mousedown( -> $(this).addClass('ui-state-active'))
+	.mouseup( -> $(this).removeClass('ui-state-active'))
 
+	$('#menu_bar A[refresh]').click( (e) ->
+		e.preventDefault()
+		nodeController.nodeView.remove()
+		nodeController.loadRoot()
+	)
 
 $(document).ready( ->
 	window.nodeController = new NodeController
@@ -122,4 +134,6 @@ $(document).ready( ->
 	nodeController.loadRoot()
 	# Create the status bar
 	window.status_bar = new StatusBar().attach()
+	
+	setupButtons()
 )

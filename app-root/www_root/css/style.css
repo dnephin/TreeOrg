@@ -90,16 +90,20 @@ header H1 {
 	margin-left: -190px;
 }
 
-/* def about link */
-#about_link {
+/* def menu bar */
+#menu_bar {
 	position: fixed;
 	left: 0; top: 0;
-	padding: 6px 10px;
-	font-family: 'Bowlby One', sans-serif;
-	font-size: 2em;
-	color: #990000;
+	padding: 8px;
 	display: block;
-	text-decoration: none;
+	float: left;
+}
+
+#menu_bar A {
+	display: block;
+	float: left;
+	margin: 0 1px;
+	padding: 4px 0;
 }
 
 #user_bar {
