@@ -32,8 +32,8 @@ class NodeView extends Backbone.View
 		events["change " + viewId + " .value"] = 'update'
 		events["click " + viewId + " .focusme"] = 'focus'
 		events["click " + viewId + " .removeme"] = 'delete'
-		events["mouseover " + viewId] = 'showButtons'
-		events["mouseout " + viewId] = 'hideButtons'
+		events["mouseover " + viewId] = 'hoverOver'
+		events["mouseout " + viewId] = 'hoverOut'
 		return events
 
 	update: (e) ->
@@ -59,11 +59,11 @@ class NodeView extends Backbone.View
 		console.log("remove[#{@model.get('value')}]")
 		@state.delete(e)
 
-	showButtons: (e) ->
-		@state.showButtons(e)
+	hoverOver: (e) ->
+		@state.hoverOver(e)
 
-	hideButtons: (e) ->
-		@state.hideButtons(e)
+	hoverOut: (e) ->
+		@state.hoverOut(e)
 
 
 class StatusBar extends Backbone.View

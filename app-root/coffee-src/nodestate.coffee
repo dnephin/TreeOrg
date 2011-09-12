@@ -37,13 +37,15 @@ class NodeStateBase
 		@model.destroy()
 		@view.remove()
 
-	showButtons: (e) ->
+	hoverOver: (e) ->
 		@select('focus').show()
-		# TODO: does with this in keyboard refactor
+		# TODO: do this in keyboard refactor
 #		@select('remove').show()
 		@view.$('> .disp').addClass('active')
+		#.ui-icon-gear
+		# .ui-icon-arrowthick-1-se .ui-icon-arrowthick-1-nw
 
-	hideButtons: (e) ->
+	hoverOut: (e) ->
 		@select('focus').stop(true, true).hide()
 		@select('remove').stop(true, true).hide()
 		@view.$('> .disp').removeClass('active')
