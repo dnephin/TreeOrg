@@ -16,6 +16,12 @@
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited { color: #140f06; text-decoration: none; }
 .ui-widget :active { outline: none; }
 
+.ui-state-default {
+	display: inline-block;
+	margin: 0 1px;
+	padding: 4px 0;
+	width: 24px;
+}
 
 /* Icons
 ----------------------------------*/

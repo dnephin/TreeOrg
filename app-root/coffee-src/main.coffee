@@ -34,6 +34,7 @@ class NodeView extends Backbone.View
 		events["click " + viewId + " .removeme"] = 'delete'
 		events["mouseover " + viewId] = 'hoverOver'
 		events["mouseout " + viewId] = 'hoverOut'
+		events["mouseover " + viewId + ' .options-button'] = 'showOptions'
 		return events
 
 	update: (e) ->
@@ -64,6 +65,9 @@ class NodeView extends Backbone.View
 
 	hoverOut: (e) ->
 		@state.hoverOut(e)
+
+	showOptions: (e) ->
+		@state.showOptions(e)
 
 
 class StatusBar extends Backbone.View
@@ -114,19 +118,23 @@ parseUrlSearch = ->
 		params[parts[0]] = parts[1]
 	return params
 
-setupButtons = ->
-	$('.ui-state-default').hover(
+setupButtons = (container) ->
+	container or= $('body')
+	makeButton(container.find('.ui-state-default'))
+	$('#menu_bar A[refresh]').click( (e) ->
+		e.preventDefault()
+		nodeController.nodeView.remove()
+		nodeController.loadRoot()
+	)
+
+makeButton = (selector) ->
+	selector.hover(
 		-> $(this).addClass('ui-state-hover')
 		-> $(this).removeClass('ui-state-hover').removeClass('ui-state-active')
 	)
 	.mousedown( -> $(this).addClass('ui-state-active'))
 	.mouseup( -> $(this).removeClass('ui-state-active'))
 
-	$('#menu_bar A[refresh]').click( (e) ->
-		e.preventDefault()
-		nodeController.nodeView.remove()
-		nodeController.loadRoot()
-	)
 
 $(document).ready( ->
 	window.nodeController = new NodeController

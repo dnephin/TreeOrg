@@ -17,8 +17,7 @@ class NodeStateBase
 		div = $(@view.make('div', class: 'disp', id: @view.cid))
 			.removeClass(@allStateClassNames).addClass(@className)
 			.append(@buildValue())
-			.append(@buildFocusButton())
-			.append(@buildRemoveButton())
+			.append(@buildOptionButton())
 		$(@el).html(div)
 		$(@el).append(cc)
 		return $(@el)
@@ -38,17 +37,31 @@ class NodeStateBase
 		@view.remove()
 
 	hoverOver: (e) ->
-		@select('focus').show()
-		# TODO: do this in keyboard refactor
-#		@select('remove').show()
-		@view.$('> .disp').addClass('active')
+		@select('disp').addClass('active')
+		@select('option').show()
+
 		#.ui-icon-gear
 		# .ui-icon-arrowthick-1-se .ui-icon-arrowthick-1-nw
 
 	hoverOut: (e) ->
-		@select('focus').stop(true, true).hide()
-		@select('remove').stop(true, true).hide()
-		@view.$('> .disp').removeClass('active')
+#		@select('focus').stop(true, true).hide()
+#		@select('remove').stop(true, true).hide()
+		@select('disp').removeClass('active')
+		@select('option').hide()
+		@select('options').hide()
+
+	showOptions: (e) ->
+		ele = $(@view.make('div', class: 'options-bar'))
+		ele.append('button1 button2')
+		@select('disp').append(ele)
+
+	buildOptionButton: ->
+		#<a class="ui-state-default ui-corner-all" href="#" totop title="top"><span class="ui-icon ui-icon-circle-arrow-n"></span></a>
+		ele = @view.make('a',
+			class: 'ui-state-default ui-corner-all options-button', href: '#', title: 'options')
+		$(ele)
+			.append(@view.make('span', class: 'ui-icon ui-icon-gear'))
+			.hide()
 
 	buildValue: ->
 		$('<input type="text">').addClass('value').val(@model.get('value'))
@@ -69,9 +82,11 @@ class NodeStateBase
 	select: (ele) ->
 		switch ele
 			when 'value' then @view.$(' > .disp > .value')
-			when 'focus' then @view.$(' > .disp > .focusme')
-			when 'remove' then @view.$(' > .disp > .removeme')
 			when 'child_container' then @view.$(' > .child_container')
+			when 'disp' then @view.$(' > .disp')
+			when 'option' then @view.$(' > .disp > .options-button')
+			when 'options' then @view.$(' > .disp > .options-bar')
+#			when 'remove' then @view.$(' > .disp > .removeme')
 
 
 class NodeStateOpen extends NodeStateBase
