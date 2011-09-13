@@ -146,7 +146,10 @@
 .ui-icon-plusthick { background-position: -32px -128px; }
 .ui-icon-minus { background-position: -48px -128px; }
 .ui-icon-minusthick { background-position: -64px -128px; }
-.ui-icon-close { background-position: -80px -128px; }
+.ui-icon-close { 
+	background-position: -80px -128px; 
+	background-image: url(/img/ui-icons_990000_256x240.png);
+}
 .ui-icon-closethick { background-position: -96px -128px; }
 .ui-icon-key { background-position: -112px -128px; }
 .ui-icon-lightbulb { background-position: -128px -128px; }
@@ -160,7 +163,8 @@
 .ui-icon-alert { background-position: 0 -144px; }
 .ui-icon-info { background-position: -16px -144px; }
 .ui-icon-notice { background-position: -32px -144px; }
-.ui-icon-help { background-position: -48px -144px; 
+.ui-icon-help { 
+	background-position: -48px -144px; 
 	background-image: url(/img/ui-icons_990000_256x240.png);
 }
 .ui-icon-check { background-position: -64px -144px; }
@@ -207,7 +211,10 @@
 .ui-icon-circlesmall-close { background-position: -32px -208px; }
 .ui-icon-squaresmall-plus { background-position: -48px -208px; }
 .ui-icon-squaresmall-minus { background-position: -64px -208px; }
-.ui-icon-squaresmall-close { background-position: -80px -208px; }
+.ui-icon-squaresmall-close { 
+	background-position: -80px -208px; 
+	background-image: url(/img/ui-icons_990000_256x240.png);
+}
 .ui-icon-grip-dotted-vertical { background-position: 0 -224px; }
 .ui-icon-grip-dotted-horizontal { background-position: -16px -224px; }
 .ui-icon-grip-solid-vertical { background-position: -32px -224px; }

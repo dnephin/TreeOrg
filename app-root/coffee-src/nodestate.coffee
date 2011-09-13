@@ -5,8 +5,10 @@ class NodeStateBase
 	###
 	
 	className: ''
-
 	allStateClassNames: 'node_open node_closed node_empty'
+	removeButtonClass: 'ui-icon-close'
+	toggleButtonClass: 'ui-icon-arrowthick-1-se'
+	
 	
 	constructor: (@view, @parentView) ->
 		@model = @view.model
@@ -28,7 +30,7 @@ class NodeStateBase
 		options.success = callback if callback
 		@model.save({}, options)
 
-	focus: (e) ->
+	toggle: (e) ->
 		e.preventDefault() if e
 
 	delete: (e) ->
@@ -39,43 +41,40 @@ class NodeStateBase
 	hoverOver: (e) ->
 		@select('disp').addClass('active')
 		@select('option').show()
-
-		#.ui-icon-gear
 		# .ui-icon-arrowthick-1-se .ui-icon-arrowthick-1-nw
 
 	hoverOut: (e) ->
 #		@select('focus').stop(true, true).hide()
-#		@select('remove').stop(true, true).hide()
 		@select('disp').removeClass('active')
 		@select('option').hide()
-		@select('options').hide()
 
 	showOptions: (e) ->
-		ele = $(@view.make('div', class: 'options-bar'))
-		ele.append('button1 button2')
-		@select('disp').append(ele)
+		@select('disp').append(@buildOptionsBar())
 
 	buildOptionButton: ->
-		#<a class="ui-state-default ui-corner-all" href="#" totop title="top"><span class="ui-icon ui-icon-circle-arrow-n"></span></a>
-		ele = @view.make('a',
-			class: 'ui-state-default ui-corner-all options-button', href: '#', title: 'options')
-		$(ele)
-			.append(@view.make('span', class: 'ui-icon ui-icon-gear'))
+		@buildButton('ui-icon-gear')
+			.attr('title', 'options')
+			.addClass('options-button')
 			.hide()
+
+	buildButton: (type) ->
+		makeButton(
+			$(@view.make('a', class: 'ui-state-default ui-corner-all', href: '#'))
+			.append(@view.make('span', class: "ui-icon #{type}"))
+		)
+
+	buildOptionsBar: ->
+		removeButton = @buildButton(@removeButtonClass)
+			.click( (e) => @delete(e) )
+		toggleButton = @buildButton(@toggleButtonClass)
+			.click( (e) => @toggle(e) )
+		$(@view.make('div', class: 'options-bar'))
+			.append(removeButton)
+			.append(toggleButton)
+			.mouseleave( => @select('options').remove() )
 
 	buildValue: ->
 		$('<input type="text">').addClass('value').val(@model.get('value'))
-
-	buildFocusButton: ->
-		el = @select('focus')
-		disp = if el.length then el else $('<a href="#">').hide()
-		disp.html('-&gt;&gt;').addClass('focusme button').removeClass('flip_text')
-
-	buildRemoveButton: ->
-		if @model.get('root_node')
-			''
-		else
-			$('<a href="#">x</a>').addClass('removeme button')
 
 	buildChildContainer: -> ''
 
@@ -86,7 +85,6 @@ class NodeStateBase
 			when 'disp' then @view.$(' > .disp')
 			when 'option' then @view.$(' > .disp > .options-button')
 			when 'options' then @view.$(' > .disp > .options-bar')
-#			when 'remove' then @view.$(' > .disp > .removeme')
 
 
 class NodeStateOpen extends NodeStateBase
@@ -95,11 +93,12 @@ class NodeStateOpen extends NodeStateBase
 	###
 
 	className: 'node_open'
+	toggleButtonClass: 'ui-icon-arrowthick-1-nw'
 
 	addChildToDom: (child) ->
 		@select('child_container').append(child)
 
-	focus: (e) ->
+	toggle: (e) ->
 		super e
 		@view.changeState NodeState.closed
 		@view.render()
@@ -110,8 +109,6 @@ class NodeStateOpen extends NodeStateBase
 		@buildEmptyNode()
 		return $(@el)
 
-	buildFocusButton: ->
-		super().html('&lt;&lt;-').addClass('flip_text')
 
 	buildEmptyNode: ->
 		emptyNode = new NodeView(
@@ -140,7 +137,7 @@ class NodeStateClosed extends NodeStateBase
 
 	className: 'node_closed'
 
-	focus: (e) ->
+	toggle: (e) ->
 		super e
 		@view.changeState NodeState.open
 		@view.state.render()
@@ -166,9 +163,7 @@ class NodeStateEmpty extends NodeStateBase
 
 	delete: (e) ->
 
-	# Empty node does not have a focus or remove  button
-	buildFocusButton: ->
-	buildRemoveButton: ->
+	buildOptionButton: ->
 
 	buildValue: ->
 		$('<input type="text">').addClass('value')
