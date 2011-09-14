@@ -16,7 +16,7 @@ class NodeStateBase
 
 	render: ->
 		cc = @buildChildContainer()
-		div = $(@view.make('div', class: 'disp', id: @view.cid))
+		div = $(@view.make('div', class: 'disp clearfix', id: @view.cid))
 			.removeClass(@allStateClassNames).addClass(@className)
 			.append(@buildValue())
 			.append(@buildOptionButton())
@@ -41,15 +41,21 @@ class NodeStateBase
 	hoverOver: (e) ->
 		@select('disp').addClass('active')
 		@select('option').show()
-		# .ui-icon-arrowthick-1-se .ui-icon-arrowthick-1-nw
 
 	hoverOut: (e) ->
-#		@select('focus').stop(true, true).hide()
+		# TODO: better selector
+		rel = $(e.relatedTarget)
+		if rel.parent().hasClass('node') and rel.prev().attr('id') == @view.cid
+			return
 		@select('disp').removeClass('active')
 		@select('option').hide()
+		# TODO: this breaks because mouseoff the button triegers hoverOut
+		#@select('options').remove()
 
 	showOptions: (e) ->
-		@select('disp').append(@buildOptionsBar())
+		# toggle display
+		@select('options').remove().length or
+			@select('disp').after(@buildOptionsBar())
 
 	buildOptionButton: ->
 		@buildButton('ui-icon-gear')
@@ -69,8 +75,8 @@ class NodeStateBase
 		toggleButton = @buildButton(@toggleButtonClass)
 			.click( (e) => @toggle(e) )
 		$(@view.make('div', class: 'options-bar'))
-			.append(removeButton)
 			.append(toggleButton)
+			.append(removeButton)
 			.mouseleave( => @select('options').remove() )
 
 	buildValue: ->
@@ -84,7 +90,7 @@ class NodeStateBase
 			when 'child_container' then @view.$(' > .child_container')
 			when 'disp' then @view.$(' > .disp')
 			when 'option' then @view.$(' > .disp > .options-button')
-			when 'options' then @view.$(' > .disp > .options-bar')
+			when 'options' then @view.$(' > .options-bar')
 
 
 class NodeStateOpen extends NodeStateBase
@@ -127,7 +133,7 @@ class NodeStateOpen extends NodeStateBase
 			@addChildToDom(childView.render())
 
 	buildChildContainer: ->
-		$('<div>').addClass('child_container')
+		$('<div>').addClass('child_container clearfix')
 
 
 class NodeStateClosed extends NodeStateBase

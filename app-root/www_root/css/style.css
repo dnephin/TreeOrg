@@ -119,39 +119,55 @@ header H1 {
 
 .default_display > .disp {
 	padding; 3px;
-	margin: 2px;
-	border: solid 0 #e5e5e5;
-	width: 308px;
-	border: solid 1px transparent;
+	margin: 1px 0;
+	width: 320px;
+	border: 1px solid #fff;
 	background: #f0f0f0;
+	float: left;
+	border-right: 0;
 }
-.default_display > .disp.active {
+.default_display > .disp.active { 
 	border-top-color: #d0d0d0;
 	border-bottom-color: #d0d0d0;
 	background: #f0f0f0;
 }
+
 .child_container .default_display:first-child > .disp:first-child {
 }
 
 .default_display > .disp > .value {
-	padding: 2px;
-	margin: 2px;
+	padding: 2px 10px;
 	font-size: 1.3em;
 	border: 0px;
 	width: 260px;
 	background: transparent;
+	height: 32px;
 }
 .default_display > .disp > .value:focus {
     outline: none;
 	color: black;
 }
 
+.default_display > .options-bar {
+	padding: 5px 10px;
+	margin: 1px 0;
+	float: left;
+	border: solid 1px #d0d0d0;
+	border-left: none;
+	background: #f0f0f0;
+	height: 26px;
+}
+.default_display > .options-bar A {
+	float: left;
+}
+
 /* def Button */
 .default_display > .disp > .options-button {
 	text-decoration: none;
-	position: relative;
-	left: 10px;
-	top: 5px;
+	border: 0;
+	margin: 7px 7px 0 0;
+	float: right;
+	background: transparent;
 }
 
 .child_container {

@@ -17,10 +17,8 @@
 .ui-widget :active { outline: none; }
 
 .ui-state-default {
-	display: inline-block;
 	margin: 0 1px;
 	padding: 4px 0;
-	width: 24px;
 }
 
 /* Icons
@@ -76,7 +74,8 @@
 .ui-icon-arrowthick-1-n { background-position: 0 -48px; }
 .ui-icon-arrowthick-1-ne { background-position: -16px -48px; }
 .ui-icon-arrowthick-1-e { background-position: -32px -48px; }
-.ui-icon-arrowthick-1-se { background-position: -48px -48px; }
+/* Why is this broken ? */
+.ui-icon-arrowthick-1-se { background-position: -46px -48px; }
 .ui-icon-arrowthick-1-s { background-position: -64px -48px; }
 .ui-icon-arrowthick-1-sw { background-position: -80px -48px; }
 .ui-icon-arrowthick-1-w { background-position: -96px -48px; }
@@ -137,7 +136,14 @@
 .ui-icon-zoomout { background-position: -144px -112px; }
 .ui-icon-search { background-position: -160px -112px; }
 .ui-icon-wrench { background-position: -176px -112px; }
-.ui-icon-gear { background-position: -192px -112px; }
+.ui-icon-gear { 
+/*	background-position: -192px -112px;  */
+/* Why is this broken ? */
+	background-position: -193px -113px;
+}
+.ui-state-hover .ui-icon-gear { 
+	background-image: url(/img/ui-icons_222222_256x240.png); 
+}
 .ui-icon-heart { background-position: -208px -112px; }
 .ui-icon-star { background-position: -224px -112px; }
 .ui-icon-link { background-position: -240px -112px; }
